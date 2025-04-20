@@ -1,0 +1,1166 @@
+:root{
+
+    --principal: rgb(46, 46, 46);
+    --secundario:rgb(103, 103, 103);
+    --terciario:rgb(198, 204, 211);
+    --blanco: rgb(255,255,255);
+    --fondo:rgb(26, 26, 26);
+    --letranegra: rgb(0, 0, 0);
+    --fondoclaro: rgb(134, 134, 134);
+    --letrauno:rgb(207, 207, 207);
+    --letrados:rgb(179, 179, 179);
+    --sombra:rgba(132, 189, 255, 0.1);
+    --sombra2:rgba(50, 72, 97, 0.568);
+    --azul:rgb(121, 130, 255);
+    --rojo: rgb(255, 110, 110);
+    /* --letranombres:rgb(204, 237, 241); */
+}
+
+.blur
+{
+    filter: blur(5px);
+    transition: filter 0.3s ease;
+}
+
+.show-popup
+{
+    visibility: visible !important;
+    opacity: 1 !important;
+    transition-delay: 0s;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.0); /* Fondo semi-transparente */
+    z-index: 999; /* Un índice más alto que el contenido de .ContLP */
+    display: none; /* Inicialmente oculto */
+}
+
+.overlay.show {
+    display: block;
+}
+
+body, html{
+    font-family:'Courier New', Courier, monospace;
+    font-size: 20px;
+    justify-content: center;
+    margin:0px;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background-color: var(--fondo);
+    background-repeat: no-repeat;
+    background-size: 1920px 1080px;
+
+}
+
+/* =========================
+   Sección: CONTENEDOR DE TODAS LAS PAGINAS
+   ========================= */
+.ContLP
+{
+    display: relative;
+    margin: 0px;
+    padding: 0px;
+    width: 90%;
+    height: 100%;
+}
+
+/* =========================
+   Sección: HEADERS
+   ========================= */
+.headertitulo
+{
+    background-color: var(--principal);
+    margin: 10px;
+    display: grid;
+    width: auto;
+    height: 50px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    grid-template-columns: repeat(5,1fr);
+    padding: 0 20px 0 40px;
+    font-weight: bold;
+}
+
+.headertitulo #titulo
+{
+    display: flex;
+    font-size: 35px;
+    grid-column: 1/2;
+    color: var(--letrauno);
+    cursor: default;
+}
+
+.headertitulo #btnreg
+{
+    display: flex;
+    grid-column: 5/6;
+    justify-content: right;
+    align-items: center;
+    color: var(--letrauno);
+    cursor: pointer;
+}
+.headertitulo #btnis
+{
+    display: flex;
+    grid-column: 4/5;
+    justify-content: right;
+    align-items: center;
+    color: var(--letrauno);
+    cursor: pointer;
+}
+
+.headerNav{
+    grid-column: 4/6;
+    display: grid;
+    grid-template-columns: repeat(auto,1fr);
+}
+
+.headerNav .headerbtn{
+    grid-row: 1/2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px;
+    height: 100%;
+    color: var(--letrauno);
+    cursor: pointer;
+}
+
+.headerbtn .tooltip-text{
+    visibility: hidden;
+    color: var(--letrauno);
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    opacity: 0;
+    transition: opacity .3s, visibility .3s, font-size .3s;
+    font-size: 0px;
+}
+
+.headerbtn:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+    font-size: inherit;
+}
+
+.headerNav .headerbtn a img{
+    display: flex;
+    width: 40px;
+    filter: invert(80%) sepia(10%) saturate(10%) hue-rotate(0deg);
+}
+
+.headerbtn a{
+    color: inherit;
+    text-decoration: none;
+}
+
+
+
+.contimglp
+{
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    grid-template-columns: repeat(2,1fr);
+    height: 100%;
+}
+
+.contimglp img{
+    display: flex;
+    width: auto;
+    justify-self: center;
+    align-self: center;
+    border-radius: 10px;
+    box-shadow: 0px 5px 10px 3px var(--sombra); /* hacia x, hacia y, blur, tamaño excedente, color */
+}
+
+
+
+.contIS
+{
+    display: contents;
+    justify-self: center;
+    align-self: center;
+}
+
+.popupIScont {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--principal);
+    box-shadow: 0px 5px 10px 3px var(--sombra);
+    z-index: 1000;
+    width: 700px; /* Ajusta el ancho según tus necesidades */
+    height: 400px; /* Ajusta la altura según tus necesidades */
+    border-radius: 10px;
+    padding: 20px;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0.3s, opacity 0.3s ease;
+}
+
+.formISyREG
+{
+    background-color: var(--secundario);
+    border-radius: 10px;
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-rows: repeat(3,1fr);
+    gap: 10px;
+    box-shadow: 0px 5px 10px 3px var(--sombra);
+
+}
+
+.formISyREG .continput
+{
+    display: grid;
+    grid-template-rows: repeat(2,1fr);
+    grid-template-columns: repeat(4,1fr);
+    justify-content: left;
+    align-items: center;
+    padding: 20px;
+    height: 100%;
+    color: var(--letrauno);
+
+}
+.formISyREG .continput .descinput
+{
+    font-size: inherit;
+    font: inherit;
+    font-weight: bold;
+    grid-column: 1/4;
+    grid-row: 1/2;
+}
+.formISyREG .continput .inputgen
+{
+    grid-row: 2/3;
+    grid-column: 1/4;
+    width: 90%;
+    font: inherit;
+    border-radius: 12px;
+    border: none;
+    padding: 5px 5px 5px 10px;
+    height: 25px;
+    font-size: 18px;
+    align-self: normal;
+    box-shadow: 0 5px 10px 3px var(--sombra2);
+
+}
+
+.inputgen
+{
+    width: 90%;
+    font: inherit;
+    border-radius: 12px;
+    border: none;
+    padding: 5px 5px 5px 10px;
+    height: 25px;
+    font-size: 18px;
+    align-self: normal;
+    box-shadow: 0 5px 10px 3px var(--sombra2);
+}
+
+.formISyREG .continput .selectgen
+{
+    grid-row: 2/3;
+    grid-column: 1/4;
+    width: 90%;
+    font: inherit;
+    border-radius: 12px;
+    border: none;
+    padding: 5px 5px 5px 10px;
+    height: 30px;
+    font-size: 18px;
+    align-self: normal;
+    box-shadow: 0 5px 10px 3px var(--sombra2);
+
+}
+
+
+.botones
+{
+    border-radius: 10px;
+    border: none;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    height: 30px;
+    font-size: 15px;
+    font-family: inherit;
+    box-shadow: 0 5px 10px 3px var(--sombra2);
+    cursor: pointer;
+    background-color: var(--blanco);
+}
+
+.formISyREG .continput #btnformis
+{
+    grid-column: 3/4;
+    grid-row: 1/2;
+}
+
+.formISyREG .continput #btnformsalir
+{
+    grid-row: 1/2;
+    grid-column: 4/5;
+
+}
+
+#mostrarcontracont {
+    align-self: normal;
+    justify-self: normal;
+    grid-row: 2/3;
+    grid-column: 4/5;
+    width: auto;
+    height: 30px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    position: relative;
+    cursor: pointer;
+}
+
+#mostrarcontracont img {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    transition: opacity 0.3s ease;
+    filter: drop-shadow(0px 3px 0px var(--sombra2));
+}
+
+#mostrarcontracont div{
+    position: relative;
+    white-space: nowrap;
+    margin-left: 50px;
+}
+#mostrarcontracont .unchecked {
+    opacity: 1;
+}
+
+#mostrarcontracont .checked {
+    opacity: 0;
+}
+
+#mostrarcontracont.checked .checked {
+    opacity: 1;
+}
+
+#mostrarcontracont.checked .unchecked {
+    opacity: 0;
+}
+
+a
+{
+    text-decoration: none;
+    color: inherit;
+}
+
+/* =========================
+   Sección: PANTALLA DE REGISTRO
+   ========================= */
+
+.formREGcont
+{
+    position:relative;
+    top: 10%;
+    left: 25%;
+    background-color: var(--principal);
+    box-shadow: 0px 5px 10px 3px var(--sombra);
+    width: 700px; /* Ajusta el ancho según tus necesidades */
+    border-radius: 10px;
+    padding: 20px;
+    margin:10px ;
+}
+
+.formISyREG .continput #btnreg
+{
+    grid-column: 3/4;
+    grid-row: 1/2;
+}
+
+
+.formISyREG .continput #btnregcancel
+{
+    grid-row: 1/2;
+    grid-column: 4/5;
+
+}
+
+/* =========================
+   Sección: CONTENIDO GENERAL
+   ========================= */
+
+.ContenidoGeneral{
+
+    margin: 30px 30px 30px 30px;
+    display: grid;
+    width:95%;
+    height: auto;
+    align-self: center;
+    justify-self: center;
+    /* border-radius: 10px;    */
+    grid-template-columns: repeat(5,1fr);
+    grid-template-rows: repeat(auto-fill,1fr);
+    padding: 20px 20px 20px 20px;
+    font-weight: bold;
+    color: var(--letranegra);
+    gap: 20px 0px;
+}
+
+.ContainerCrearPubli{
+    grid-column: 1/6;
+    background-color: var(--fondoclaro);
+    width: 100%;
+    height: auto;
+    justify-self: center;
+    align-self: center;
+    border-radius: 15px;
+}
+
+.ContainerCrearPubli form{
+    margin: 20px;
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    grid-template-rows: repeat(5,1fr);
+}
+
+.ContainerCrearPubli .DescripcionPubli{
+    grid-column: 1/4;
+    grid-row: 1/5;
+    display: flex;
+    margin: 10px;
+    height: 150px;
+    font: inherit;
+    font-weight: normal;
+    padding: 10px;
+    resize: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 10px 3px var(--sombra2);
+}
+
+.ContainerCrearPubli .imgContainer{
+    grid-column: 4/6;
+    grid-row: 1/5;
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    margin: 10px;
+    height: 150px;
+    justify-content: center;
+    align-items: center;
+    gap: 30px 0;
+}
+
+.ContainerCrearPubli .imgContainer img{
+    display: flex;
+    width: 70px;
+    height: 70px;
+    border-radius: 15px;
+    box-shadow: 0 5px 10px 3px var(--sombra2);
+    object-fit: cover;
+    align-self: center;
+    justify-self: center;
+}
+
+.containerCrearPubli .imgContainer .imgoptions{
+    position: relative;
+    display: inline-block;
+}
+.containerCrearPubli .imgContainer .imgoptions:hover{
+    filter: brightness(0.8);
+}
+
+.ContainerCrearPubli .imgContainer .imgoptions:hover{
+    filter: brightness(0.8);
+}
+
+
+.ContainerCrearPubli .imgContainer .imgoptions .borrarfotobtn{
+    position:absolute;
+    top: 5px; /* Ajusta según sea necesario */
+    right: 25px; /* Ajusta según sea necesario */
+    color: rgb(134, 134, 134);
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    cursor: pointer;
+    z-index: 1;
+}
+
+#btnsubirimg{
+    grid-column: 4/5;
+    grid-row: 5/6;
+    display: flex;
+    justify-self: center;
+    align-self: center;
+}
+
+#btnpublicar{
+    grid-column: 1/2;
+    grid-row: 5/6;
+    display: flex;
+    justify-self: center;
+    align-self: center;
+}
+
+/* =========================
+   Sección: PUBLICACIONES
+   ========================= */
+.ContainerPublicaciones{
+    grid-column: 1/6;
+    width: 95%;
+    height: auto;
+    justify-self: center;
+    align-self: center;
+    padding: 30px;
+    margin: 20px;
+    display: grid;
+    grid-template-rows: repeat(auto-fill,1fr);
+    gap: 30px 0;
+}
+
+.ContainerPublicaciones .Publicacion{
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    grid-template-rows: repeat(auto-fill,1fr);
+    gap: 20px 0;
+    background-color: var(--fondoclaro);
+    padding: 20px;
+    border-radius: 15px;
+    width: 100%;
+    justify-self: center;
+    align-self: center;
+}
+
+.ContainerPublicaciones .Publicacion .PublicacionHeaderImg{
+    grid-column: 2/6;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ContainerPublicaciones .Publicacion .PublicacionHeaderImg img{
+    border-radius: 20px;
+    box-shadow: 0 5px 10px 3px var(--sombra2);
+}
+
+.pppublis{
+    display: flex;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 5px 10px 3px var(--sombra2);
+}
+.ContainerPublicaciones .Publicacion .PublicacionHeaderNombre{
+    grid-column: 1/2;
+    grid-row: 1/2;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    object-fit:contain;
+    padding: 20px 20px 0 20px;
+}
+.nombresamigos
+{
+    color: var(--letranegra);
+}
+.ContainerPublicaciones .Publicacion .PublicacionBody{
+    grid-column: 2/6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 110px;
+    padding: 10px;
+    overflow: auto;
+}
+
+.ContainerPublicaciones .Publicacion .PublicacionBody::-webkit-scrollbar{
+    width: 10px;
+    height: 10px;
+}
+
+.ContainerPublicaciones .Publicacion .PublicacionBody::-webkit-scrollbar-track {
+    background: var(--blanco);
+    border-radius: 10px;
+}
+
+.ContainerPublicaciones .Publicacion .PublicacionBody::-webkit-scrollbar-thumb {
+    background: var(--letranegra);
+    border-radius: 10px;
+}
+
+.ContainerPublicaciones .Publicacion .PublicacionBody::-webkit-scrollbar-thumb:hover {
+    background: #313131;
+}
+
+/* =========================
+   Sección: AMIGOS
+   ========================= */
+
+.containerSearchAmigos{
+    grid-column: 1/2;
+    width: auto;
+    height: 750px;
+    display: grid;
+    padding: 10px;
+    border-radius: 15px;
+    grid-template-columns: repeat(5,1fr);
+    grid-template-rows: 55px 11fr;
+    gap: 20px 0;
+    background-color: var(--fondoclaro);
+}
+
+.containerSearchAmigos .searchAmigos{
+    grid-column: 1/6;
+    grid-row: 1/2;
+    gap: 20px 0;
+    grid-template-columns: repeat(5,1fr);
+    height: 50px;
+    display: grid;
+}
+
+.containerSearchAmigos .searchAmigos #searchAmigosInput{
+    grid-column: 1/5;
+    grid-row: 1/2;
+}
+.containerSearchAmigos .searchAmigos #searchAmigosBtn{
+    grid-column: 5/6;
+    grid-row: 1/2;
+    width: 35px;
+    height: 35px;
+    justify-self: center;
+}
+.containerSearchAmigos .searchAmigos #searchAmigosBtn img{
+    object-fit: contain;
+    width: 20px;
+    height: 20px;
+}
+
+.conatinerSearchResult{
+    grid-row: 2/3;
+    grid-column: 1/6;
+    display:flex;
+    flex-direction: column;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(auto-fill,70px);
+    gap: 20px 0;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x:visible;
+}
+.conatinerSearchResult::-webkit-scrollbar{
+    width: 5px;
+    height: 5px;
+}
+
+.conatinerSearchResult::-webkit-scrollbar-track {
+    background: var(--blanco);
+    border-radius: 5px;
+}
+
+.conatinerSearchResult::-webkit-scrollbar-thumb {
+    background: var(--letranegra);
+    border-radius: 5px;
+}
+
+.conatinerSearchResult::-webkit-scrollbar-thumb:hover {
+    background: #313131;
+}
+
+.conatinerSearchResult .searchResult{
+    height: 50px;
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+}
+
+.conatinerSearchResult .searchResult .nombresamigos{
+    padding: 10px 0 10px 0;
+    grid-column: 2/5;
+    display: flex;
+}
+
+.conatinerSearchResult .searchResult .nombresamigos a{
+    align-self: center;
+    color: var(--letranegra);
+    font-weight: bold;
+    font-size: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conatinerSearchResult .searchResult .botones{
+    grid-column: 5/6;
+    padding: 5px;
+    display: flex;
+    justify-self: center;
+    align-self: center;
+    height: 30px;
+    width: 30px;
+    cursor: pointer;
+}
+
+.conatinerSearchResult .searchResult .botones img{
+    object-fit: cover;
+    width: 25px;
+    height: 25px;
+    padding: 0px;
+}
+.conatinerSearchResult .searchResult .ppsearch{
+    grid-column: 1/2;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.conatinerSearchResult .searchResult .ppsearch img{
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px 3px var(--sombra2);
+}
+
+
+/* =========================
+   Sección: AMIGOS AGREGADOS
+   ========================= */
+.amigosContainer{
+    grid-column: 2/5;
+    width: 95%;
+    background-color: var(--fondoclaro);
+    border-radius: 15px;
+    margin: 0px 20px 0 20px;
+    padding: 10px;
+    display: grid;
+    flex-direction: column;
+    align-self: center;
+    justify-self: center;
+    height: 750px;
+    overflow: auto;
+}
+
+.amigosContainer::-webkit-scrollbar{
+    width: 8px;
+}
+
+.amigosContainer::-webkit-scrollbar-track {
+    background: var(--blanco);
+    border-radius: 5px;
+}
+
+.amigosContainer::-webkit-scrollbar-thumb {
+    background: var(--letranegra);
+    border-radius: 5px;
+}
+
+.amigosContainer::-webkit-scrollbar-thumb:hover {
+    background: #313131;
+}
+
+
+.amigosContainer .headerAmigosContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
+    width: inherit;
+}
+
+.amigosContainer .selectAmigosContainer{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    grid-template-rows: repeat(auto-fill, 100px);
+    gap: 40px 20px;
+    width: 100%;
+    height: 100%;
+}
+
+.amigosContainer .selectAmigosContainer .selectAmigo{
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    grid-template-rows: 100px;
+    background-color: var(--terciario);
+    height: 100px;
+    width: 95%;
+    border-radius: 15px;
+    box-shadow: 0 5px 10px 3px var(--sombra2);
+    margin: 0px 10px 10px 10px;
+}
+
+.selectAmigoPP{
+    grid-column: 1/2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.selectAmigoPP img{
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px 3px var(--sombra2);
+}
+.selectAmigoNombre{
+    grid-column: 2/5;
+    display: flex;
+    /* text-align: center; */
+    /* justify-content: center; */
+    align-items: center;
+    width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.selectAmigoBotones{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.selectAmigoBotones img{
+    width: 30px;
+    height: 30px;
+    padding: 5px;
+    cursor: pointer;
+}
+
+/* =========================
+   Sección: AMIGOS PENDIENTES
+   ========================= */
+
+.amigosPendContainer{
+    grid-column: 5/6;
+    width: 90%;
+    background-color: var(--fondoclaro);
+    border-radius: 15px;
+    margin: 0px 20px 0 20px;
+    display: grid;
+    flex-direction: column;
+    align-self: center;
+    justify-self: center;
+    height: 750px;
+    overflow: hidden;
+    grid-template-rows: repeat(9,1fr);
+    grid-template-columns: repeat(5,1fr);
+
+}
+
+.amigosPendContainer #headerpendientes{
+    grid-column: 1/10;
+    grid-row: 1/2;
+    align-self: center;
+    justify-self: center;
+}
+.amigosPendContainer #headerpendientes h1{
+    text-align: center;
+}
+
+
+.amigosPendContainer #Solicitudescontainer{
+    grid-column: 1/6;
+    grid-row: 2/10;
+    display: grid;
+    grid-template-rows: repeat(auto-fill,100px);
+    padding: 10px;
+    gap: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.amigosPendContainer #Solicitudescontainer .solicitud{
+    background-color: var(--terciario);
+    display: grid;
+    width: 100%;
+    height: 100px;
+    border-radius: 15px;
+    align-self: center;
+    justify-self: center;
+    grid-template-columns: repeat(4,1fr);
+    padding: 0px 2px
+}
+
+.solicitud .selectAmigoPP{
+    grid-column: 1/2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.solicitud .selectAmigoPP img{
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px 3px var(--sombra2);
+}
+.solicitud .selectAmigoNombre{
+    grid-column: 2/4;
+    display: flex;
+    /* text-align: center; */
+    justify-content: center;
+    align-items: center;
+    width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* =========================
+   Sección: PERFIL
+   ========================= */
+
+
+.perfilContainer{
+    grid-column: 2/5;
+    background-color: var(--secundario);
+    width: 100%;
+    height: 750px;
+    border-radius: 15px;
+    padding: 10px;
+}
+
+.perfil{
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    grid-template-rows: repeat(7,1fr);
+    width: 100%;
+    height: 100%;
+    font: inherit;
+}
+
+.cambiarPPpreview{
+    display: flex;
+    width: 300px;
+    grid-column: 1/4;
+    grid-row: 1/4;
+    align-self: center;
+    justify-self: center;
+    border-radius: 15px;
+    box-shadow: 0 5px 10px 3px var(--sombra2);
+}
+
+.perfil #subirimagenbtn{
+    grid-column: 1/4;
+    grid-row: 4/5;
+    display: flex;
+    align-self: center;
+    justify-self: center;
+    font: inherit;
+
+}
+
+.perfil #acomodarbotones{
+    display: flex;
+    flex-direction: column;
+    grid-column: 1/4;
+    grid-row: 7/8;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+}
+.perfil #guardarPPchange{
+    background-color: var(--azul);
+    display: flex;
+    font: inherit;
+
+}
+
+.perfil #cancelarPPchange{
+    display: flex;
+    font: inherit;
+
+}
+
+.perfil #cerrarsesionbtn{
+    display: flex;
+    font: inherit;
+    background-color: var(--rojo);
+}
+
+.perfil #camposPerfilContainer{
+    grid-column: 4/8;
+    grid-row: 1/8;
+    background-color: var(--terciario);
+    border-radius: 15px;
+    padding: 20px 0px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.reporteLikesContainer{
+    grid-column: 2/5;
+    grid-row: 3/4;
+    background-color: var(--secundario);
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: auto;
+}
+
+.likesrecibidosContainer{
+    background-color: var(--terciario);
+    height: auto;
+    padding: 20px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.likesrecibidosContainer h1 {
+    margin: 0;
+}
+/* =========================
+   Sección: CREACION DE PUBLICACION
+   ========================= */
+
+
+
+
+.PublicacionInteracciones {
+            
+    top: -250%;
+    left: -50%; 
+    width: 100%;
+    height: 80%;
+    padding: 8%;
+    border-top: 1px solid #e0e0e0;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    grid-row: 3/4;
+    grid-column: 1/2;
+}
+
+.comentarioTextbox {
+    width: 100%;
+    margin-left: -5%;
+    resize: none;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: border 0.3s;
+}
+
+.comentarioTextbox:focus {
+    border: 1px solid #3b5998;
+    outline: none;
+}
+
+.botonesInteraccion {
+    grid-row: 2/3;
+    grid-column: 1/2;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+
+}
+
+.btnLike, .btnGuardar {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    height: 50px;
+}
+
+.btnLike {
+    background-color: rgb(198, 204, 211);
+    color: #fff;
+}
+
+.btnLike:hover {
+    background-color: #365899;
+    transform: scale(1.05);
+}
+
+.btnGuardar {
+    background-color:rgb(198, 204, 211);
+    color: #fff;
+}
+
+.btnGuardar:hover {
+    background-color: #009975;
+    transform: scale(1.05);
+}
+
+.btnComentar {
+background-color: rgb(198, 204, 211);
+color: #fff;
+font-size: 14px;
+font-weight: bold;
+border: none;
+padding: 8px 16px;
+border-radius: 8px;
+cursor: pointer;
+margin-bottom: 10px;
+transition: background-color 0.3s, transform 0.2s;
+display: block;
+}
+
+.btnComentar:hover {
+background-color: #e67e22;
+transform: scale(1.05);
+}
+
+.comentariosList {
+    display: flex;
+    flex-direction: column;   /* apila los comentarios uno debajo del otro */
+    overflow-y: auto;         /* scroll vertical si hay muchos */
+    height: 157.88px;
+    width: 900px;        /* ajusta según cuánto quieres que se vea */
+    gap: 5px;
+    padding: 10px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    background-color: var(--terciario);
+    grid-column: 2/6;
+    grid-row: 3/4;
+    justify-self: center;
+}
+
+.comentario {
+    background-color: white;
+    padding: 12px 16px;              /* Más espacio interno */
+    border-radius: 8px;
+    font-size: 14px;
+    box-shadow: 0 4px 4px rgb(0, 0, 0);
+    white-space: normal;             /* Permite saltos de línea */
+    word-break: break-word;          /* Rompe palabras largas si es necesario */
+    width: 100%;                     /* Ocupa todo el ancho disponible */
+    max-width: 100%;                 /* Evita que se salga del contenedor */
+    box-sizing: border-box;          /* Incluye padding en el ancho */
+}
+    
+
+
