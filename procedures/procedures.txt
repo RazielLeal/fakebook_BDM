@@ -1,0 +1,227 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_Master`(IN `accion` CHAR(1), IN `p_usuarios_id` INT, IN `p_nombres` VARCHAR(255), IN `p_apellidos` VARCHAR(255), IN `p_username` VARCHAR(255), IN `p_contra` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_imagen_perfil` LONGBLOB, IN `p_publicacion_id` INT, IN `p_fechaNacimiento` DATE, IN `p_genero` ENUM('Hombre','Mujer','No especificar'), IN `p_contenido` TEXT, IN `p_url_media` MEDIUMBLOB, IN `p_tipo` ENUM('imagen','video'), IN `p_busqueda` TEXT, IN `p_amigo_id` INT, IN `p_opcion` TEXT, IN `p_id_amigos` INT)
+BEGIN
+    CASE accion
+
+-- ACEPTAR O RECHAZAR SOLICITUDES:J
+
+WHEN 'J' THEN
+            IF p_opcion = 'ACEPTAR' THEN
+                -- Actualiza la solicitud pendiente a 'Aceptado'
+                UPDATE amigos
+                SET estado = 'Aceptado'
+                WHERE id_amigos = p_id_amigos;
+                
+                IF NOT EXISTS (
+            SELECT 1 
+            FROM amigos 
+            WHERE usuario_id = p_usuarios_id 
+              AND amigo_id = p_amigo_id 
+              AND estado = 'Aceptado'
+        ) THEN
+            INSERT INTO amigos (usuario_id, amigo_id, estado)
+            VALUES (p_usuarios_id, p_amigo_id, 'Aceptado');
+        END IF;
+
+            ELSEIF p_opcion = 'RECHAZAR' THEN
+                -- Actualiza la solicitud pendiente a 'Rechazado'
+                UPDATE amigos
+                SET estado = 'Rechazado'
+                WHERE id_amigos = p_id_amigos;
+                
+            ELSE
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'Opción inválida para la solicitud';
+            END IF;
+            
+
+-- PENDIENTES: Obtener solicitudes de amistad pendientes para el usuario (donde p_usuarios_id coincide con amigo_id)
+WHEN 'E' THEN
+    SELECT 
+        a.id_amigos,
+        a.usuario_id,
+        u.username,
+        u.imagen_perfil,
+        a.fecha_solicitud
+    FROM amigos a
+    JOIN usuarios u ON a.usuario_id = u.usuarios_id
+    WHERE a.amigo_id = p_usuarios_id 
+      AND a.estado = 'Pendiente';
+
+-- AGREGAR: Enviar solicitud de amistad (Agregar amigo)
+WHEN 'N' THEN
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM amigos 
+        WHERE usuario_id = p_usuarios_id 
+          AND amigo_id = p_amigo_id
+    ) THEN
+        INSERT INTO amigos (usuario_id, amigo_id)
+        VALUES (p_usuarios_id, p_amigo_id);
+    END IF;
+
+        -- S: Buscar Usuarios
+        WHEN 'S' THEN
+            SELECT 
+                usuarios_id, 
+                username, 
+                imagen_perfil
+            FROM usuarios
+            WHERE (username LIKE CONCAT('%', p_busqueda, '%')
+               OR email LIKE CONCAT('%', p_busqueda, '%')
+               OR nombres LIKE CONCAT('%', p_busqueda, '%'))
+               AND p_usuarios_id <> usuarios_id;
+
+-- M: Inserción de imágenes en media_publicaciones
+WHEN 'M' THEN
+    INSERT INTO media_publicaciones (publicacion_id, url_media, tipo)
+    VALUES (p_publicacion_id, p_url_media, p_tipo);
+
+-- B: Crear Publicación con múltiples medios adjuntos
+WHEN 'B' THEN
+    INSERT INTO publicaciones (usuarios_id, contenido)
+    VALUES (p_usuarios_id, p_contenido);
+
+    SET @pub_id = LAST_INSERT_ID();
+    SELECT @pub_id AS pub_id;
+
+        -- A: Actualizar Usuario
+        WHEN 'A' THEN
+            UPDATE usuarios
+            SET 
+                nombres = IFNULL(p_nombres, nombres),
+                apellidos = IFNULL(p_apellidos, apellidos),
+                username = IFNULL(p_username, username),
+                contra = IFNULL(p_contra, contra),
+                email = IFNULL(p_email, email),
+                imagen_perfil = IFNULL(p_imagen_perfil, imagen_perfil)
+            WHERE usuarios_id = p_usuarios_id;
+
+        -- F: Amigo Favorito
+        WHEN 'F' THEN
+            SELECT 
+                usuarios_publicacion.username AS DueñodePublicacion,
+                COUNT(likes.publicacion_id) AS TotalLikes
+            FROM likes
+            INNER JOIN usuarios ON likes.usuarios_id = usuarios.usuarios_id
+            INNER JOIN publicaciones ON likes.publicacion_id = publicaciones.publicacion_id
+            INNER JOIN usuarios AS usuarios_publicacion ON publicaciones.usuarios_id = usuarios_publicacion.usuarios_id
+            WHERE usuarios.usuarios_id = p_usuarios_id
+            GROUP BY usuarios_publicacion.username
+            ORDER BY TotalLikes DESC
+            LIMIT 1;
+		
+        -- L: Dar Like
+        WHEN 'L' THEN
+            IF NOT EXISTS (
+                SELECT 1 
+                FROM likes 
+                WHERE usuarios_id = p_usuarios_id AND publicacion_id = p_publicacion_id
+            ) THEN
+                INSERT INTO likes (usuarios_id, publicacion_id)
+                VALUES (p_usuarios_id, p_publicacion_id);
+            END IF;
+
+        -- P: Datos de Perfil
+        WHEN 'P' THEN
+            SELECT 
+                nombres,
+                apellidos,
+                username,
+                contra,
+                email,
+                imagen_perfil
+            FROM usuarios
+            WHERE usuarios_id = p_usuarios_id;
+     
+        -- D: Likes Dados
+        WHEN 'D' THEN
+            SELECT 
+                COUNT(like_id) AS total_likes_dados
+            FROM likes
+            WHERE usuarios_id = p_usuarios_id;
+
+       -- O: Obtener Publicaciones de Amigos y del Propio Usuario
+WHEN 'O' THEN
+    SELECT 
+        t.publicacion_id,
+        t.usuarios_id,
+        t.username,
+        t.imagen_perfil,
+        t.contenido,
+        t.fecha_publicacion,
+        mp.url_media,
+        mp.tipo
+    FROM (
+        SELECT 
+            p.publicacion_id,
+            p.usuarios_id,
+            u.username,
+            u.imagen_perfil,
+            p.contenido,
+            p.fecha_publicacion
+        FROM publicaciones p
+        JOIN amigos a ON (
+            (a.usuario_id = p_usuarios_id AND a.amigo_id = p.usuarios_id)
+            OR
+            (a.amigo_id = p_usuarios_id AND a.usuario_id = p_usuarios_id)
+        )
+        JOIN usuarios u ON u.usuarios_id = p.usuarios_id
+        WHERE a.estado = 'aceptado'
+        
+        UNION
+        
+        SELECT 
+            p.publicacion_id,
+            p.usuarios_id,
+            u.username,
+            u.imagen_perfil,
+            p.contenido,
+            p.fecha_publicacion
+        FROM publicaciones p
+        JOIN usuarios u ON u.usuarios_id = p.usuarios_id
+        WHERE p.usuarios_id = p_usuarios_id
+    ) AS t
+    LEFT JOIN media_publicaciones mp ON mp.publicacion_id = t.publicacion_id
+    ORDER BY t.fecha_publicacion DESC;
+
+
+        -- R: Registrar Usuario
+        WHEN 'R' THEN
+            INSERT INTO usuarios (
+                nombres, apellidos, email, username, contra, fechaNacimiento, genero
+            )
+            VALUES (
+                p_nombres, p_apellidos, p_email, p_username, p_contra, p_fechaNacimiento, p_genero
+            );
+
+        -- T: Total de Likes en Publicaciones
+        WHEN 'T' THEN
+            SELECT 
+                SUM(like_count) AS total_likes
+            FROM (
+                SELECT 
+                    p.publicacion_id,
+                    COUNT(l.like_id) AS like_count
+                FROM 
+                    publicaciones p
+                LEFT JOIN 
+                    likes l ON p.publicacion_id = l.publicacion_id
+                WHERE 
+                    p.usuarios_id = p_usuarios_id
+                GROUP BY 
+                    p.publicacion_id
+            ) AS likes_por_publicacion;
+
+        -- V: Validar Usuario por Email
+        WHEN 'V' THEN
+            SELECT * 
+            FROM usuarios 
+            WHERE email = p_email;
+
+        ELSE
+            SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'Acción no reconocida';
+    END CASE;
+END$$
+DELIMITER ;
