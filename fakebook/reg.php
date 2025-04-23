@@ -41,9 +41,9 @@ if (isset($_POST['btnreg'])) {
     if (validar_contraseña($nuevaContra)) {
         $contra = password_hash($nuevaContra, PASSWORD_BCRYPT); // Encriptar la contraseña
 
-        // Llamar al stored procedure
-        $stmt = $conn->prepare("CALL SP_RegistrarUsuario(?,?,?,?,?,?,?)");
-        $stmt->bind_param("sssssss", $nombre, $apellidos, $email, $username, $contra, $fechaNacimiento, $genero);
+        $stmt = $conn->prepare("CALL SP_Master(?, NULL, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, NULL, NULL, NULL, NULL)");
+        $accion = 'R';
+        $stmt->bind_param("ssssssss", $accion, $nombre, $apellidos, $username, $contra, $email, $fechaNacimiento, $genero);
 
         if ($stmt->execute()) {
             header("Location: index.php?registro=exitoso");

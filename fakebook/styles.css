@@ -466,19 +466,28 @@ a
     width: 70px;
     height: 70px;
     border-radius: 15px;
-    box-shadow: 0 5px 10px 3px var(--sombra2);
+    filter: drop-shadow(0 5px 5px var(--sombra2));
     object-fit: cover;
     align-self: center;
     justify-self: center;
 }
 
-.containerCrearPubli .imgContainer .imgoptions{
+.ContainerCrearPubli .imgContainer video{
+    display: flex;
+    width: 70px;
+    height: 70px;
+    border-radius: 15px;
+    filter: drop-shadow(0 5px 5px var(--sombra2));
+    object-fit: cover;
+    align-self: center;
+    justify-self: center;
+}
+
+.ContainerCrearPubli .imgContainer .imgoptions{
     position: relative;
     display: inline-block;
 }
-.containerCrearPubli .imgContainer .imgoptions:hover{
-    filter: brightness(0.8);
-}
+
 
 .ContainerCrearPubli .imgContainer .imgoptions:hover{
     filter: brightness(0.8);
@@ -486,18 +495,16 @@ a
 
 
 .ContainerCrearPubli .imgContainer .imgoptions .borrarfotobtn{
-    position:absolute;
-    top: 5px; /* Ajusta según sea necesario */
-    right: 25px; /* Ajusta según sea necesario */
-    color: rgb(134, 134, 134);
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    text-align: center;
-    line-height: 20px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
     cursor: pointer;
-    z-index: 1;
+    font-size: 20px;
+    color: red;
+    background-color: white;
+    border-radius: 50%;
+    padding: 5px;
+
 }
 
 #btnsubirimg{
@@ -555,7 +562,12 @@ a
 
 .ContainerPublicaciones .Publicacion .PublicacionHeaderImg img{
     border-radius: 20px;
-    box-shadow: 0 5px 10px 3px var(--sombra2);
+    filter: drop-shadow(0 5px 10px var(--sombra2));
+}
+
+.ContainerPublicaciones .Publicacion .PublicacionHeaderImg video{
+    border-radius: 20px;
+    filter: drop-shadow(0 5px 10px var(--sombra2));
 }
 
 .pppublis{
@@ -693,7 +705,7 @@ a
     display: flex;
 }
 
-.conatinerSearchResult .searchResult .nombresamigos a{
+.conatinerSearchResult .searchResult .nombresamigos div{
     align-self: center;
     color: var(--letranegra);
     font-weight: bold;
@@ -1043,11 +1055,9 @@ a
 
 .PublicacionInteracciones {
             
-    top: -250%;
-    left: -50%; 
     width: 100%;
     height: 80%;
-    padding: 8%;
+    padding: 20px;
     border-top: 1px solid #e0e0e0;
     background-color: #f9f9f9;
     border-radius: 10px;
@@ -1135,12 +1145,12 @@ transform: scale(1.05);
 
 .comentariosList {
     display: flex;
-    flex-direction: column;   /* apila los comentarios uno debajo del otro */
-    overflow-y: auto;         /* scroll vertical si hay muchos */
+    flex-direction: column;   
+    overflow-y: auto;         
     height: 157.88px;
-    width: 900px;        /* ajusta según cuánto quieres que se vea */
+    width: 900px;        
     gap: 5px;
-    padding: 10px;
+    padding: 20px;
     border-radius: 10px;
     box-sizing: border-box;
     background-color: var(--terciario);

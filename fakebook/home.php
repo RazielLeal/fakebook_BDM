@@ -10,22 +10,13 @@
     }
     
 
-    $sql = "CALL SP_ObtenerPublicacionesDeAmigos(?)";
+    
+    $sql = "CALL SP_Master(?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $usuarios_id);
+    $accion = 'O';
+    $stmt->bind_param("si", $accion, $usuarios_id);
     $stmt->execute();
-    $result = $stmt->get_result();
-
-    // Llamar al Stored Procedure
-    
-    // while ($row = $result->fetch_assoc()) {
-    //     $publicacion_id = $row['publicacion_id'];
-    //     $usuarios_id = $row['usuarios_id'];
-    //     $username = $row['username'];
-    //     $imagen_perfil = $row['imagen_perfil'];
-    //     $contenido = $row['contenido'];
-    // }
-    
+    $result = $stmt->get_result();  
    
     $stmt->close();
     // Cerrar conexiones
@@ -91,18 +82,14 @@
         <section class="ContenidoGeneral" id="ContenidoGeneral">
             
             <section class="ContainerCrearPubli" id="ContainerCrearPubli" enctype="multipart/form-data">
-                <form action="" method="POST" data-url="">
+                <form action="crearPubli.php" method="POST" enctype="multipart/form-data">
 
-                    <textarea type="text" class="DescripcionPubli" id="publicacion" cols="30" rows="10" placeholder="Comparte lo que piensas!"></textarea>
+                    <textarea name="contenido" type="text" class="DescripcionPubli" id="publicacion" cols="30" rows="10" placeholder="Comparte lo que piensas!"></textarea>
 
                     <div class="imgContainer" id="imgContainer">
-                        <div class="imgoptions">
-                            <img src="IMG/meme.jpg" alt="preview">
-                            <span class="borrarfotobtn">&times</span>
-                        </div>
                     </div>
 
-                    <button class="botones" id="btnpublicar" type="submit" value="Publicar">Publicar</button>
+                    <button class="botones" id="btnpublicar" name="btnpublicar" type="submit" value="Publicar">Publicar</button>
                     <label class="botones" id="btnsubirimg" for="media">Subir imagen</label>
                     <input  type="file" id="media" name="media" accept="image/*,video/*" style="display: none;">
                 </form>
@@ -120,7 +107,10 @@
                         $amigo_id = $row['usuarios_id'];
                         $username = $row['username'];
                         $contenido = $row['contenido'];
-                
+                        $url_media = $row['url_media'];
+                        $tipo = $row['tipo'];
+
+
                         // Convertir imagen de perfil si no es NULL
                         if (!empty($row['imagen_perfil'])) {
                             $imagen_perfil = 'data:image/jpeg;base64,' . base64_encode($row['imagen_perfil']);
@@ -130,10 +120,29 @@
                 
                         echo '<div class="Publicacion" id="Publicacion_'. $publicacion_id . '">';
 
+                        //<!-- CONTAINER DEL TEXTO DE LA PUBLICACION -->
+                        echo '<div class="PublicacionBody" id="PublicacionBody">';
+
+                            echo '<p>' . htmlspecialchars($contenido) . '</p>';
+
+                        echo '</div>';
+
                         // <!-- CONTAINER DE LA IMAGEN DE LA PUBLICACION -->
                         echo '<div class="PublicacionHeaderImg" id="PublicacionHeaderImg">';
 
                             //echo '<img src="IMG/meme.jpg" alt="">';
+                            //echo '<img src="data:image/png;base64,' . base64_encode($row["url_media"]) . '" alt="">';
+                            if ($row["tipo"] === "imagen") {
+                                // Muestra la imagen; si conoces el formato, ajusta "image/png"
+                                echo '<img src="data:image/png;base64,' . base64_encode($row["url_media"]) . '" alt="">';
+                            } elseif ($row["tipo"] === "video") {
+                                // Muestra el video; ajusta el tipo MIME ("video/mp4") según corresponda
+                                echo '<video controls>';
+                                echo '<source src="data:video/mp4;base64,' . base64_encode($row["url_media"]) . '" type="video/mp4">';
+                                echo 'Tu navegador no soporta la etiqueta de video.';
+                                echo '</video>';
+                            }
+                            
 
                         echo '</div>';
 
@@ -145,12 +154,7 @@
 
                         echo '</div>';
 
-                        //<!-- CONTAINER DEL TEXTO DE LA PUBLICACION -->
-                        echo '<div class="PublicacionBody" id="PublicacionBody">';
-
-                            echo '<p>' . htmlspecialchars($contenido) . '</p>';
-
-                        echo '</div>';
+                        
 
                         //<!-- CONTAINER DE LA INTERACCION DE LA PUBLICACION -->
                         echo '<div class="PublicacionInteracciones">'; 
@@ -182,9 +186,12 @@
     </div>
 
 
+
+    <script src="previewIMG.js"></script>
     <script>
     // Esperamos a que todo el DOM esté cargado
     document.addEventListener('DOMContentLoaded', () => {
+
 
         const publicaciones = document.querySelectorAll('.Publicacion');
 

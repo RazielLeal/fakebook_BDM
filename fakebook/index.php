@@ -11,13 +11,14 @@ if (isset($_POST['btnformis'])) {
     // Verificar si los campos están vacíos
     if (!empty($email) && !empty($contra)) {
         // Llamar al stored procedure
-        $query = "CALL SP_ValidarUsuario(?)";
+        $query = "CALL SP_Master(?, NULL, NULL, NULL, NULL, NULL, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
         $stmt = $conn->prepare($query); // Preparar la consulta
         if (!$stmt) {
             die("Error en la consulta preparada: " . $conn->error);
         }
         
-        $stmt->bind_param("s", $email); // Vincular parámetros
+        $accion = 'V';
+        $stmt->bind_param("ss", $accion, $email); // Vincular parámetros
         $stmt->execute();
         $result = $stmt->get_result();
 

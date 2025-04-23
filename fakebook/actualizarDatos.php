@@ -11,9 +11,10 @@ $usuarios_id = $_SESSION['usuarios_id'];
 $errorPasswordMsg = "";
 
 // Cargar datos actuales del usuario
-$query = "CALL SP_DatosPerfil(?)";
+$query = "CALL SP_Master(?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("i", $usuarios_id);
+$accion = 'P';
+$stmt->bind_param("si", $accion, $usuarios_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $DatosUsuario = $result->fetch_assoc();
@@ -55,9 +56,10 @@ if (isset($_POST['guardarPPchange'])) {
     if ($errorPasswordMsg === "") {
         $imagen_perfil = ($_FILES['mediapp']['name']) ? file_get_contents($_FILES['mediapp']['tmp_name']) : null;
     
-        $query = "CALL SP_ActualizarUsuario(?, ?, ?, ?, ?, ?, ?)";
+        $query = "CALL SP_Master(?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL,NULL, NULL, NULL, NULL)";
+        $accion = 'A';
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("issssss", $usuarios_id, $nombres, $apellidos, $username, $contra, $email, $imagen_perfil);
+        $stmt->bind_param("sissssss", $accion, $usuarios_id, $nombres, $apellidos, $username, $contra, $email, $imagen_perfil);
         $stmt->execute();
     
         header("Location: perfil.php?success=1");

@@ -10,9 +10,12 @@ if (isset($_POST['usuarios_id']) && isset($_POST['publicacion_id'])) {
     $publicacion_id = $_POST['publicacion_id'];
 
     // Llamamos al stored procedure para dar el like
-    $sql = "CALL SP_DarLike(?, ?)";
+    //$sql = "CALL SP_DarLike(?, ?)";
+    $sql = "CALL SP_Master(?, ?, NULL, NULL, NULL, NULL, NULL, NULL, ?, NULL, NULL, NULL)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ii", $usuarios_id, $publicacion_id);
+    $accion = 'L';  
+    $stmt->bind_param("sii", $accion, $usuarios_id, $publicacion_id);
+    
 
     if ($stmt->execute()) {
         // Verificamos si el like ya existía

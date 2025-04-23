@@ -13,9 +13,11 @@
     $usuarios_id = $_SESSION['usuarios_id']; // Obtener el user_id del usuario logueado
 
 
-    $query = "CALL SP_DatosPerfil(?)";
+    //DATOS DE PERFIL
+    $query = "CALL SP_Master(?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $usuarios_id);  // 'i' significa entero
+    $accion='P';
+    $stmt->bind_param("si", $accion, $usuarios_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -97,6 +99,7 @@
                     
                     <script>
                         console.log("Información del usuario:");
+                        console.log("ID: <?php echo $usuarios_id; ?>");
                         console.log("Nombres: <?php echo $nombres; ?>");
                         console.log("Apellidos: <?php echo $apellidos; ?>");
                         console.log("Usuario: <?php echo $username; ?>");
@@ -148,46 +151,55 @@
                 <div class="likesrecibidos" id="likesrecibidos">
                     <div class="likesrecibidosContainer" id="likesrecibidosContainer">
 
-                    <?php
+                            <?php
                                 // Supón que $usuarios_id contiene el ID del usuario que está logueado (por ejemplo, 15)
                                 // Llamada al stored procedure
-                                $query = "CALL SP_TotalLikes(?)";
+                                $query = "CALL SP_Master(?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
+                                //$query = "CALL SP_TotalLikes(?)";
                                 $stmt = $conn->prepare($query);
-                                $stmt->bind_param("i", $usuarios_id);  // 'i' significa entero
+                                $accion ='T';
+                                $stmt->bind_param("si", $accion, $usuarios_id);
+                                //$stmt->bind_param("i", $usuarios_id);
                                 $stmt->execute();
                                 $result = $stmt->get_result();
 
                                 // Recuperamos el resultado y mostramos el total de likes
                                 if ($row = $result->fetch_assoc()) {
                                     
-                                    echo "<h1>Has recibido ".$row['total_likes']." 👍 me gusta!!!</h1>";                                
-                                } else {
-                                    echo "<h1>Aún no haz recibido ningun me gusta. Haz una publicación para recibir me gusta.</h1>";
+                                    if ($row['total_likes'] > 0) {
+                                        // Mostrar el total de likes
+                                        echo "<h1>Has recibido ".$row['total_likes']." 👍 me gusta!!!</h1>";
+                                    } else {
+                                        echo "<h1>Aún no haz recibido ningun me gusta. Haz una publicación para recibir me gusta.</h1>";
+                                    }
                                 }
 
                                 // Liberamos los recursos
+                                
                                 $result->free();
                                 $stmt->close();
 
-                                $query = "CALL SP_LikesDados(?)";
+                                //$query = "CALL SP_LikesDados(?)";
+                                $query = "CALL SP_Master(?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
                                 $stmt = $conn->prepare($query);
-                                $stmt->bind_param("i", $usuarios_id);  // 'i' significa entero
+                                $accion ='D';
+                                $stmt->bind_param("si", $accion, $usuarios_id);  // 'i' significa entero
                                 $stmt->execute();
                                 $result = $stmt->get_result();
                             
                                 // Recuperamos el resultado y mostramos la cantidad de likes dados
                                 if ($row = $result->fetch_assoc()) {
                                     echo "<h1>Has dado un total de " . $row['total_likes_dados'] . " 👍 me gusta!!!</h1>";
-                                } else {
-                                    echo "<p>No has dado likes aún.</p>";
-                                }
+                                } 
 
                                 $result->free();
                                 $stmt->close();
 
-                                $query = "CALL SP_AmigoFavorito(?)";
+                                //$query = "CALL SP_AmigoFavorito(?)";
+                                $query = "CALL SP_Master(?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
                                 $stmt = $conn->prepare($query);
-                                $stmt->bind_param("i", $usuarios_id); // "i" es para un entero (user_id)
+                                $accion ='F';
+                                $stmt->bind_param("si", $accion, $usuarios_id);                                
                                 $stmt->execute();
 
                                 // Obtener los resultados
@@ -199,7 +211,7 @@
                                         echo "<br>Le has dado " . $row['TotalLikes'] . " 👍 me gusta!!!</h1>";
                                     }
                                 } else {
-                                    echo "No se encontraron resultados.";
+                                    echo "<h1>Para saber quien es tu amigo favorito, interactúa con ellos.</h1>";
                                 }
 
                                 // Cerrar la conexión
