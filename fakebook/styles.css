@@ -1,13 +1,13 @@
 :root{
 
-    --principal: rgb(46, 46, 46);
-    --secundario:rgb(103, 103, 103);
+    --principal: #2C5282;
+    --secundario:#E5E7EB;
     --terciario:rgb(198, 204, 211);
     --blanco: rgb(255,255,255);
-    --fondo:rgb(26, 26, 26);
+    --fondo:#F8FAFC;
     --letranegra: rgb(0, 0, 0);
-    --fondoclaro: rgb(134, 134, 134);
-    --letrauno:rgb(207, 207, 207);
+    --fondoclaro: #E5E7EB;
+    --letrauno:#374151;
     --letrados:rgb(179, 179, 179);
     --sombra:rgba(132, 189, 255, 0.1);
     --sombra2:rgba(50, 72, 97, 0.568);
@@ -466,28 +466,19 @@ a
     width: 70px;
     height: 70px;
     border-radius: 15px;
-    filter: drop-shadow(0 5px 5px var(--sombra2));
+    box-shadow: 0 5px 10px 3px var(--sombra2);
     object-fit: cover;
     align-self: center;
     justify-self: center;
 }
 
-.ContainerCrearPubli .imgContainer video{
-    display: flex;
-    width: 70px;
-    height: 70px;
-    border-radius: 15px;
-    filter: drop-shadow(0 5px 5px var(--sombra2));
-    object-fit: cover;
-    align-self: center;
-    justify-self: center;
-}
-
-.ContainerCrearPubli .imgContainer .imgoptions{
+.containerCrearPubli .imgContainer .imgoptions{
     position: relative;
     display: inline-block;
 }
-
+.containerCrearPubli .imgContainer .imgoptions:hover{
+    filter: brightness(0.8);
+}
 
 .ContainerCrearPubli .imgContainer .imgoptions:hover{
     filter: brightness(0.8);
@@ -495,16 +486,18 @@ a
 
 
 .ContainerCrearPubli .imgContainer .imgoptions .borrarfotobtn{
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    cursor: pointer;
-    font-size: 20px;
-    color: red;
-    background-color: white;
+    position:absolute;
+    top: 5px; /* Ajusta según sea necesario */
+    right: 25px; /* Ajusta según sea necesario */
+    color: rgb(134, 134, 134);
+    border: none;
     border-radius: 50%;
-    padding: 5px;
-
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    cursor: pointer;
+    z-index: 1;
 }
 
 #btnsubirimg{
@@ -562,12 +555,7 @@ a
 
 .ContainerPublicaciones .Publicacion .PublicacionHeaderImg img{
     border-radius: 20px;
-    filter: drop-shadow(0 5px 10px var(--sombra2));
-}
-
-.ContainerPublicaciones .Publicacion .PublicacionHeaderImg video{
-    border-radius: 20px;
-    filter: drop-shadow(0 5px 10px var(--sombra2));
+    box-shadow: 0 5px 10px 3px var(--sombra2);
 }
 
 .pppublis{
@@ -705,7 +693,7 @@ a
     display: flex;
 }
 
-.conatinerSearchResult .searchResult .nombresamigos div{
+.conatinerSearchResult .searchResult .nombresamigos a{
     align-self: center;
     color: var(--letranegra);
     font-weight: bold;
@@ -960,15 +948,26 @@ a
     font: inherit;
 }
 
-.cambiarPPpreview{
+.cambiarPPpreview {
     display: flex;
     width: 300px;
+    height: 300px;
     grid-column: 1/4;
     grid-row: 1/4;
     align-self: center;
     justify-self: center;
-    border-radius: 15px;
+    border-radius: 50%; /* Avatar circular */
+    overflow: hidden; /* Oculta partes fuera del borde circular */
     box-shadow: 0 5px 10px 3px var(--sombra2);
+    justify-content: center;
+    align-items: center;
+}
+
+.cambiarPPpreview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Escala la imagen sin deformarla */
+    border-radius: 50%;
 }
 
 .perfil #subirimagenbtn{
@@ -1055,11 +1054,11 @@ a
 
 .PublicacionInteracciones {
             
+    top: -250%;
+    left: -50%; 
     width: 100%;
     height: 80%;
-    padding: 20px;
-    border-top: 1px solid #e0e0e0;
-    background-color: #f9f9f9;
+    padding: 8%;
     border-radius: 10px;
     grid-row: 3/4;
     grid-column: 1/2;
@@ -1105,8 +1104,8 @@ a
 }
 
 .btnLike {
-    background-color: rgb(198, 204, 211);
-    color: #fff;
+    background-color: rgb(255,255,255);
+    color: rgb(0, 0, 0);
 }
 
 .btnLike:hover {
@@ -1115,8 +1114,8 @@ a
 }
 
 .btnGuardar {
-    background-color:rgb(198, 204, 211);
-    color: #fff;
+    background-color:rgb(255,255,255);
+    color: rgb(0, 0, 0);
 }
 
 .btnGuardar:hover {
@@ -1124,9 +1123,17 @@ a
     transform: scale(1.05);
 }
 
+
+#btnpublicar:active,
+#btnsubirimg:active {
+    background-color: #4677B7; /* Cambia este color como prefieras */
+    color: white;
+    transform: scale(0.98); /* Da efecto de "presionado" */
+}
+
 .btnComentar {
-background-color: rgb(198, 204, 211);
-color: #fff;
+background-color: rgb(255,255,255);
+color: rgb(0, 0, 0);
 font-size: 14px;
 font-weight: bold;
 border: none;
@@ -1145,12 +1152,12 @@ transform: scale(1.05);
 
 .comentariosList {
     display: flex;
-    flex-direction: column;   
-    overflow-y: auto;         
+    flex-direction: column;   /* apila los comentarios uno debajo del otro */
+    overflow-y: auto;         /* scroll vertical si hay muchos */
     height: 157.88px;
-    width: 900px;        
+    width: 900px;        /* ajusta según cuánto quieres que se vea */
     gap: 5px;
-    padding: 20px;
+    padding: 10px;
     border-radius: 10px;
     box-sizing: border-box;
     background-color: var(--terciario);
@@ -1170,7 +1177,136 @@ transform: scale(1.05);
     width: 100%;                     /* Ocupa todo el ancho disponible */
     max-width: 100%;                 /* Evita que se salga del contenedor */
     box-sizing: border-box;          /* Incluye padding en el ancho */
+    display: inline-block;         /* Solo ocupa el espacio del contenido */
+    max-width: 40%;                /* Evita que sean demasiado largos */
+    word-wrap: break-word;         /* Rompe palabras largas si es necesario */
+
 }
-    
 
 
+
+
+
+
+/* =========================
+   Sección: ANIMACIONES
+   ========================= */
+
+   * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background-color: #F8FAFC;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: fle;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+  }
+
+  /* Mundo - Planeta */
+  .world {
+    width: 120px;
+    height: 120px;
+    background: url('IMG/Word.png') center/cover; /* Imagen de planeta */
+    border-radius: 50%;
+    position: absolute;
+    top: 90px;
+    left: 90px;
+    animation: rotate 10s infinite linear;
+    z-index: 1;
+  }
+
+  @keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Personas (íconos) */
+  .user {
+    width: 20px;
+    height: 20px;
+    background-color: #4ADE80;
+    border-radius: 50%;
+    position: absolute;
+    opacity: 0;
+    animation: connect 1s forwards;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 14px;
+  }
+
+  .user img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+  }
+
+  /* Posiciones y delays para simular conexión */
+  .user:nth-child(2) {
+    top: 0;
+    left: 135px;
+    animation-delay: 0.5s;
+  }
+  .user:nth-child(3) {
+    top: 30px;
+    left: 230px;
+    animation-delay: 1s;
+  }
+  .user:nth-child(4) {
+    top: 180px;
+    left: 260px;
+    animation-delay: 1.5s;
+  }
+  .user:nth-child(5) {
+    top: 260px;
+    left: 140px;
+    animation-delay: 2s;
+  }
+  .user:nth-child(6) {
+    top: 200px;
+    left: 30px;
+    animation-delay: 2.5s;
+  }
+  .user:nth-child(7) {
+    top: 50px;
+    left: 20px;
+    animation-delay: 3s;
+  }
+
+  .contimglp {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    margin-top: 50px;
+  }
+  
+  .contimglp img {
+    width: auto;
+    height: auto;
+  }
+
+  .user img {
+    width: 70px;
+    height: auto;
+  }
+
+  @keyframes connect {
+    from {
+      transform: scale(0.5);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
