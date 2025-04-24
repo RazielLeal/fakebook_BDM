@@ -17,7 +17,7 @@ if (isset($_POST['btnpublicar'])) {
     }
 
     // 1️⃣ Primero, crear la publicación con SP_Master ('B')
-    $stmt = $conn->prepare("CALL SP_Master(?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?, NULL, NULL, NULL)");
+    $stmt = $conn->prepare("CALL SP_Master(?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?, NULL, NULL, NULL, NULL, NULL, NULL)");
     $accion = 'B';
     $stmt->bind_param("sis", $accion, $usuarios_id, $contenido);
 
@@ -38,7 +38,7 @@ if (isset($_POST['btnpublicar'])) {
             $tipo_media = strpos($_FILES['media']['type'], 'image') !== false ? 'imagen' : 'video';
 
             // Preparar y ejecutar SP_Master ('M')
-            $stmt = $conn->prepare("CALL SP_Master(?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?, NULL, NULL, NULL, ?,?, NULL)");
+            $stmt = $conn->prepare("CALL SP_Master(?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?, NULL, NULL, NULL, ?,?, NULL, NULL, NULL, NULL)");
             $accion_media = 'M';
             $stmt->bind_param("sibs", $accion_media, $publicacion_id, $media_data, $tipo_media);
             $stmt->send_long_data(2, $media_data); // Enviar el contenido del archivo

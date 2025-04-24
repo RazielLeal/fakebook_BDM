@@ -41,7 +41,7 @@ if (isset($_POST['btnreg'])) {
     if (validar_contraseña($nuevaContra)) {
         $contra = password_hash($nuevaContra, PASSWORD_BCRYPT); // Encriptar la contraseña
 
-        $stmt = $conn->prepare("CALL SP_Master(?, NULL, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, NULL, NULL, NULL, NULL)");
+        $stmt = $conn->prepare("CALL SP_Master(?, NULL, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL)");
         $accion = 'R';
         $stmt->bind_param("ssssssss", $accion, $nombre, $apellidos, $username, $contra, $email, $fechaNacimiento, $genero);
 
