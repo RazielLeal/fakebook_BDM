@@ -11,14 +11,13 @@ if (isset($_POST['btnformis'])) {
     // Verificar si los campos están vacíos
     if (!empty($email) && !empty($contra)) {
         // Llamar al stored procedure
-        $query = "CALL SP_Master(?, NULL, NULL, NULL, NULL, NULL, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
+        $query = "CALL SP_ValidarUsuario(?)";
         $stmt = $conn->prepare($query); // Preparar la consulta
         if (!$stmt) {
             die("Error en la consulta preparada: " . $conn->error);
         }
         
-        $accion = 'V';
-        $stmt->bind_param("ss", $accion, $email); // Vincular parámetros
+        $stmt->bind_param("s", $email); // Vincular parámetros
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -79,8 +78,28 @@ if (isset($_POST['btnformis'])) {
         </section>
     
         <section class="contimglp" id="contimglp">
-                <img src="IMG/people.jpg" alt="Descripción de la imagen" width="400" height="400">
-                <img src="IMG/peolpe_2.png" alt="Descripción de la imagen" width="900px" height="380">      
+        <img src="IMG/peolpe_2.png" alt="Descripción de la imagen" width="40px" height="100px">
+        <div class="container">
+          <div class="world"></div>
+          <div class="user">
+            <img src="IMG/pp.png" alt="User 1"> <!-- Imagen de perfil -->
+          </div>
+          <div class="user">
+            <img src="IMG/pp.png" alt="User 2"> <!-- Imagen de perfil -->
+          </div>
+          <div class="user">
+            <img src="IMG/pp.png" alt="User 3"> <!-- Imagen de perfil -->
+          </div>
+          <div class="user">
+            <img src="IMG/pp.png" alt="User 4"> <!-- Imagen de perfil -->
+          </div>
+          <div class="user">
+            <img src="IMG/pp.png" alt="User 5"> <!-- Imagen de perfil -->
+          </div>
+          <div class="user">
+            <img src="IMG/pp.png" alt="User 6"> <!-- Imagen de perfil -->
+          </div>
+        </div>
         </section>
         
     
@@ -89,7 +108,9 @@ if (isset($_POST['btnformis'])) {
     <div class="overlay"></div> 
 
     <section class="popupIScont">
-        <form action="" method="POST" class="formISyREG" id="formIS">    
+  <div class="login-container">
+    <div class="logo">Fakebook</div>
+    <form action="" method="POST" class="formISyREG" id="formIS">    
             
             <div class="continput">
                 <div class="descinput">

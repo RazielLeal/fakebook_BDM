@@ -3,11 +3,6 @@
     require 'config.php';
     session_start(); 
 
-    if (!isset($_SESSION['usuarios_id'])) {
-        header("Location: index.php");
-        exit;
-    }
-    
     $usuarios_id = $_SESSION['usuarios_id']; 
 
     if ($conn->connect_error) {
@@ -15,13 +10,22 @@
     }
     
 
-    
-    $sql = "CALL SP_Master(?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
+    $sql = "CALL SP_ObtenerPublicacionesDeAmigos(?)";
     $stmt = $conn->prepare($sql);
-    $accion = 'O';
-    $stmt->bind_param("si", $accion, $usuarios_id);
+    $stmt->bind_param("i", $usuarios_id);
     $stmt->execute();
-    $result = $stmt->get_result();  
+    $result = $stmt->get_result();
+
+    // Llamar al Stored Procedure
+    
+    // while ($row = $result->fetch_assoc()) {
+    //     $publicacion_id = $row['publicacion_id'];
+    //     $usuarios_id = $row['usuarios_id'];
+    //     $username = $row['username'];
+    //     $imagen_perfil = $row['imagen_perfil'];
+    //     $contenido = $row['contenido'];
+    // }
+    
    
     $stmt->close();
     // Cerrar conexiones
@@ -87,14 +91,18 @@
         <section class="ContenidoGeneral" id="ContenidoGeneral">
             
             <section class="ContainerCrearPubli" id="ContainerCrearPubli" enctype="multipart/form-data">
-                <form action="crearPubli.php" method="POST" enctype="multipart/form-data">
+                <form action="" method="POST" data-url="">
 
-                    <textarea name="contenido" type="text" class="DescripcionPubli" id="publicacion" cols="30" rows="10" placeholder="Comparte lo que piensas!"></textarea>
+                    <textarea type="text" class="DescripcionPubli" id="publicacion" cols="30" rows="10" placeholder="Comparte lo que piensas!"></textarea>
 
                     <div class="imgContainer" id="imgContainer">
+                        <div class="imgoptions">
+                            <img src="IMG/meme.jpg" alt="preview">
+                            <span class="borrarfotobtn">&times</span>
+                        </div>
                     </div>
 
-                    <button class="botones" id="btnpublicar" name="btnpublicar" type="submit" value="Publicar">Publicar</button>
+                    <button class="botones" id="btnpublicar" type="submit" value="Publicar">Publicar</button>
                     <label class="botones" id="btnsubirimg" for="media">Subir imagen</label>
                     <input  type="file" id="media" name="media" accept="image/*,video/*" style="display: none;">
                 </form>
@@ -112,10 +120,7 @@
                         $amigo_id = $row['usuarios_id'];
                         $username = $row['username'];
                         $contenido = $row['contenido'];
-                        $url_media = $row['url_media'];
-                        $tipo = $row['tipo'];
-
-
+                
                         // Convertir imagen de perfil si no es NULL
                         if (!empty($row['imagen_perfil'])) {
                             $imagen_perfil = 'data:image/jpeg;base64,' . base64_encode($row['imagen_perfil']);
@@ -125,6 +130,21 @@
                 
                         echo '<div class="Publicacion" id="Publicacion_'. $publicacion_id . '">';
 
+                        // <!-- CONTAINER DE LA IMAGEN DE LA PUBLICACION -->
+                        echo '<div class="PublicacionHeaderImg" id="PublicacionHeaderImg">';
+
+                            //echo '<img src="IMG/meme.jpg" alt="">';
+
+                        echo '</div>';
+
+                        //<!-- CONTAINER DEL NOMBRE DE USUARIO DE LA PUBLICACION -->
+                        echo '<div class="PublicacionHeaderNombre" id="PublicacionHeaderNombre">';
+
+                            echo '<img class="pppublis" src="' . $imagen_perfil . '" alt="">';
+                            echo '<a class="nombresamigos" href="">' . htmlspecialchars($username) . '</a>';
+
+                        echo '</div>';
+
                         //<!-- CONTAINER DEL TEXTO DE LA PUBLICACION -->
                         echo '<div class="PublicacionBody" id="PublicacionBody">';
 
@@ -132,90 +152,29 @@
 
                         echo '</div>';
 
-                        // <!-- CONTAINER DE LA IMAGEN DE LA PUBLICACION -->
-                        echo '<div class="PublicacionHeaderImg" id="PublicacionHeaderImg">';
+                        //<!-- CONTAINER DE LA INTERACCION DE LA PUBLICACION -->
+                        echo '<div class="PublicacionInteracciones">'; 
 
-                            //echo '<img src="IMG/meme.jpg" alt="">';
-                            //echo '<img src="data:image/png;base64,' . base64_encode($row["url_media"]) . '" alt="">';
-                            if ($row["tipo"] === "imagen") {
-                                // Muestra la imagen; si conoces el formato, ajusta "image/png"
-                                echo '<img src="data:image/png;base64,' . base64_encode($row["url_media"]) . '" alt="">';
-                            } elseif ($row["tipo"] === "video") {
-                                // Muestra el video; ajusta el tipo MIME ("video/mp4") según corresponda
-                                echo '<video controls>';
-                                echo '<source src="data:video/mp4;base64,' . base64_encode($row["url_media"]) . '" type="video/mp4">';
-                                echo 'Tu navegador no soporta la etiqueta de video.';
-                                echo '</video>';
-                            }
-                            
+                            echo '<textarea placeholder="Escribe un comentario..." class="comentarioTextbox" rows="2" maxlength="100"></textarea>'; 
+                            echo '<button class="btnComentar">Publicar</button>'; 
+
+                        echo '</div>'; 
+
+                        echo '<div class="botonesInteraccion">';
+
+                            echo '<button class="btnLike" data-publicacion_id="'.$publicacion_id.'">👍 Me gusta</button>';
+                            echo '<button class="btnGuardar">🗂️ Guardar</button>';
 
                         echo '</div>';
-                        
-                        echo '<div class="PublicacionHeaderNombre" id="PublicacionHeaderNombre">';
 
-                            echo '<img class="pppublis" src="' . $imagen_perfil . '" alt="">';
-                            echo '<a class="nombresamigos" href="">' . htmlspecialchars($username) . '</a>';
+                        //<!-- CONTAINER DE LOS COMENTARIOS DE LA PUBLICACION -->
+                        echo '<div class="comentariosList"></div>';
 
                         echo '</div>';
-                        
-                        ?>
 
-
-                        <!-- FUNCION DE COMENTAR -->
-                        <form class="PublicacionInteracciones" method="POST" action="comentar.php">
-
-                            <input type="hidden" name="usuarios_id" value="<?php echo htmlspecialchars($usuarios_id, ENT_QUOTES, 'UTF-8');?>"> <!-- ID del usuario que comenta -->
-                            <input type="hidden" name="publicacion_id" value="<?php echo htmlspecialchars($publicacion_id, ENT_QUOTES, 'UTF-8');?>"> <!-- ID de la publicación -->
-                            <?php echo "Usuario ID: $usuarios_id, Publicación ID: $publicacion_id"; ?>
-
-                            <textarea name="contenido" placeholder="Escribe un comentario..." class="comentarioTextbox" rows="2" maxlength="100" required></textarea>
-                            <button type="submit" class="btnComentar">📝 Publicar comentario</button>
-
-                        </form>
-
-                        <!-- LIKES Y GUARDAR -->
-                        <div class="botonesInteraccion">
-
-                            <?php echo '<button class="btnLike" data-publicacion_id="'.$publicacion_id.'">👍 Me gusta</button>';?>
-                            <?php echo '<button class="btnGuardar">💾 Guardar</button>';?>
-
-                        </div>
-
-                        <!-- CONTAINER DE LOS COMENTARIOS DE LA PUBLICACION -->
-                        <div class="comentariosList">
-
-                            <?php
-                                // Llama a la rama G del SP_Master para obtener los comentarios de esta publicación
-                                $accion_obtener_comentarios = "G";
-                                $sql_select = "CALL SP_Master(?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
-                                $stmt = $conn->prepare($sql_select);
-                                $stmt->bind_param("si", $accion_obtener_comentarios, $publicacion_id);
-
-                                if ($stmt->execute()) {
-                                    $result_comentarios = $stmt->get_result();
-                                    $comentarios = $result_comentarios->fetch_all(MYSQLI_ASSOC);
-
-                                    // Mostrar los comentarios en el contenedor
-                                    foreach ($comentarios as $comentario) {
-                                        echo '<div class="comentarioTextbox">';
-                                        echo '<p class="comentario"><strong>' . htmlspecialchars($comentario['username'], ENT_QUOTES, 'UTF-8') . ':</strong> ' . htmlspecialchars($comentario['contenido'], ENT_QUOTES, 'UTF-8') . '</p>';
-                                        echo '</div>';
-                                    }
-                                } else {
-                                    echo '<p>No se pudieron cargar los comentarios.</p>';
-                                }
-                                $stmt->close();
-                            ?>
-
-                        </div>
-
-                        
-                        
-                        
-                        
-                    <?php } ?>
-
-
+                    }
+                
+                ?>
             </section>
 
         </section>
@@ -223,10 +182,76 @@
     </div>
 
 
+    <script>
+    // Esperamos a que todo el DOM esté cargado
+    document.addEventListener('DOMContentLoaded', () => {
+    const publicaciones = document.querySelectorAll('.Publicacion');
 
-    <script src="previewIMG.js"></script>
+    publicaciones.forEach(publi => {
+        const btnComentar = publi.querySelector('.btnComentar');
+        const textarea = publi.querySelector('.comentarioTextbox');
+        const comentariosList = publi.querySelector('.comentariosList');
 
-   
-    
+        // Función que agrega el comentario
+        const publicarComentario = () => {
+            const texto = textarea.value.trim();
+            if (texto !== '') {
+                const nuevoComentario = document.createElement('p');
+                nuevoComentario.textContent = texto;
+                nuevoComentario.classList.add('comentario');
+                comentariosList.appendChild(nuevoComentario);
+                textarea.value = '';
+            }
+        };
+
+        // Evento del botón (sigue funcionando también)
+        btnComentar.addEventListener('click', publicarComentario);
+
+        // Evento al presionar Enter dentro del textarea
+        textarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Evita salto de línea
+                publicarComentario();
+            }
+        });
+    });
+
+
+    function autoResizeTextarea(textarea) {
+    textarea.style.height = 'auto'; // Reinicia la altura
+    textarea.style.height = (textarea.scrollHeight) + 'px'; // Ajusta a contenido
+}
+
+    const btnLikes = document.querySelectorAll('.btnLike');
+
+    btnLikes.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const publicacion_id = this.closest('.Publicacion').querySelector('.btnLike').dataset.publicacion_id;
+            const usuarios_id = <?php echo $usuarios_id; ?>;
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'dar_like.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                console.log(xhr.responseText);
+                if (xhr.status === 200) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            // Like agregado
+                        } else {
+                            // Ya le diste like
+                            console.log("ID de publicación:" + publicacion_id);
+                        }
+                    } catch (e) {
+                        console.error("Error al parsear JSON", e);
+                    }
+                }
+            };
+            xhr.send('usuarios_id=' + usuarios_id + '&publicacion_id=' + publicacion_id);
+        });
+    });
+});
+</script>
 </body>
 </html>
