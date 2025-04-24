@@ -184,7 +184,7 @@
                         <div class="comentariosList">
 
                             <?php
-                                Llama a la rama G del SP_Master para obtener los comentarios de esta publicación
+                                //Llama a la rama G del SP_Master para obtener los comentarios de esta publicación
                                 $accion_obtener_comentarios = "G";
                                 $sql_select = "CALL SP_Master(?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
                                 $stmt = $conn->prepare($sql_select);
