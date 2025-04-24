@@ -165,10 +165,12 @@
 
                             <input type="hidden" name="usuarios_id" value="<?php echo htmlspecialchars($usuarios_id);?>"> <!-- ID del usuario que comenta -->
                             <input type="hidden" name="publicacion_id" value="<?php echo htmlspecialchars($publicacion_id);?>"> <!-- ID de la publicación -->
-                            
+
+
+
 
                             <textarea name="contenido" placeholder="Escribe un comentario..." class="comentarioTextbox" rows="2" maxlength="100" required></textarea>
-                            <button type="submit" class="btnComentar">📝 Publicar comentario</button>
+                            <button type="submit" class="btnComentar">Publicar</button>
 
                         </form>
 
@@ -176,7 +178,7 @@
                         <div class="botonesInteraccion">
 
                             <?php echo '<button class="btnLike" data-publicacion_id="'.$publicacion_id.'">👍 Me gusta</button>';?>
-                            <?php echo '<button class="btnGuardar">💾 Guardar</button>';?>
+                            <?php echo '<button class="btnGuardar">🗂️ Guardar</button>';?>
 
                         </div>
 
@@ -227,6 +229,16 @@
     <script src="previewIMG.js"></script>
 
    
-    
+    <script>
+document.querySelectorAll('.comentarioTextbox').forEach(textarea => {
+    textarea.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault(); // Prevenir salto de línea
+            const form = this.closest('form');
+            form.submit(); // Enviar el formulario
+        }
+    });
+});
+</script>
 </body>
 </html>
