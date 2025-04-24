@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 23-04-2025 a las 10:35:53
+-- Tiempo de generación: 24-04-2025 a las 08:07:11
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -40,9 +40,12 @@ CREATE TABLE `amigos` (
 --
 
 INSERT INTO `amigos` (`id_amigos`, `usuario_id`, `amigo_id`, `estado`, `fecha_solicitud`) VALUES
-(5, 15, 21, 'Aceptado', '2025-04-22 22:32:47'),
-(7, 21, 15, 'Aceptado', '2025-04-23 02:06:01'),
-(14, 15, 13, 'Rechazado', '2025-04-23 02:17:24');
+(14, 15, 13, 'Aceptado', '2025-04-23 02:17:24'),
+(15, 13, 15, 'Aceptado', '2025-04-23 15:30:07'),
+(16, 13, 21, 'Eliminado', '2025-04-23 15:40:15'),
+(17, 21, 13, 'Eliminado', '2025-04-23 15:40:29'),
+(19, 21, 15, 'Eliminado', '2025-04-23 18:56:39'),
+(20, 15, 21, 'Bloqueado', '2025-04-23 18:56:46');
 
 --
 -- Índices para tablas volcadas
@@ -64,7 +67,7 @@ ALTER TABLE `amigos`
 -- AUTO_INCREMENT de la tabla `amigos`
 --
 ALTER TABLE `amigos`
-  MODIFY `id_amigos` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Identificador único de la relación de amistad (PK)/ Clave primaria, NOT NULL, AUTO_INCREMENT', AUTO_INCREMENT=15;
+  MODIFY `id_amigos` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Identificador único de la relación de amistad (PK)/ Clave primaria, NOT NULL, AUTO_INCREMENT', AUTO_INCREMENT=21;
 
 --
 -- Restricciones para tablas volcadas

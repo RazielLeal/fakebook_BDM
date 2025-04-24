@@ -2,37 +2,100 @@ DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_Master`(IN `accion` CHAR(1), IN `p_usuarios_id` INT, IN `p_nombres` VARCHAR(255), IN `p_apellidos` VARCHAR(255), IN `p_username` VARCHAR(255), IN `p_contra` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_imagen_perfil` LONGBLOB, IN `p_publicacion_id` INT, IN `p_fechaNacimiento` DATE, IN `p_genero` ENUM('Hombre','Mujer','No especificar'), IN `p_contenido` TEXT, IN `p_url_media` MEDIUMBLOB, IN `p_tipo` ENUM('imagen','video'), IN `p_busqueda` TEXT, IN `p_amigo_id` INT, IN `p_opcion` TEXT, IN `p_id_amigos` INT)
 BEGIN
     CASE accion
+-- Mostrar los comentarios: G
+WHEN 'G' THEN
+SELECT
+    comentarios.comentario_id,
+    comentarios.contenido,
+    usuarios.username
+FROM comentarios
+JOIN publicaciones ON publicaciones.publicacion_id = comentarios.publicacion_id
+JOIN usuarios ON usuarios.usuarios_id = comentarios.usuarios_id
+WHERE publicaciones.publicacion_id = p_publicacion_id;
+
+-- Hacer un comentario: C
+
+WHEN 'C' THEN
+INSERT
+INTO comentarios(usuarios_id, publicacion_id, contenido)
+VALUES (p_usuarios_id, p_publicacion_id, p_contenido);
+
+-- MOSTRAR LISTA DE AMIGOS: Q
+WHEN 'Q' THEN
+SELECT 
+amigos.amigo_id,
+usuarios.username,
+amigos.id_amigos,
+usuarios.imagen_perfil
+FROM amigos
+JOIN usuarios ON usuarios.usuarios_id=amigos.amigo_id
+WHERE (amigos.usuario_id=p_usuarios_id) AND (amigos.estado='Aceptado');
 
 -- ACEPTAR O RECHAZAR SOLICITUDES:J
 
 WHEN 'J' THEN
-            IF p_opcion = 'ACEPTAR' THEN
-                -- Actualiza la solicitud pendiente a 'Aceptado'
-                UPDATE amigos
-                SET estado = 'Aceptado'
-                WHERE id_amigos = p_id_amigos;
-                
-                IF NOT EXISTS (
+    IF p_opcion = 'ACEPTAR' THEN
+        -- Actualiza la solicitud pendiente a 'Aceptado'
+        UPDATE amigos
+        SET estado = 'Aceptado'
+        WHERE id_amigos = p_id_amigos;
+
+        -- Inserta la relación inversa si no existe
+        IF NOT EXISTS (
             SELECT 1 
             FROM amigos 
             WHERE usuario_id = p_usuarios_id 
-              AND amigo_id = p_amigo_id 
-              AND estado = 'Aceptado'
+              AND amigo_id = p_amigo_id
         ) THEN
             INSERT INTO amigos (usuario_id, amigo_id, estado)
             VALUES (p_usuarios_id, p_amigo_id, 'Aceptado');
+        ELSE
+            -- Si existe la relación inversa, actualiza su estado a 'Aceptado'
+            UPDATE amigos
+            SET estado = 'Aceptado'
+            WHERE usuario_id = p_usuarios_id
+              AND amigo_id = p_amigo_id;
         END IF;
 
-            ELSEIF p_opcion = 'RECHAZAR' THEN
-                -- Actualiza la solicitud pendiente a 'Rechazado'
-                UPDATE amigos
-                SET estado = 'Rechazado'
-                WHERE id_amigos = p_id_amigos;
-                
-            ELSE
-                SIGNAL SQLSTATE '45000'
-                SET MESSAGE_TEXT = 'Opción inválida para la solicitud';
-            END IF;
+    ELSEIF p_opcion = 'RECHAZAR' THEN
+        -- Actualiza la solicitud pendiente a 'Rechazado'
+        UPDATE amigos
+        SET estado = 'Rechazado'
+        WHERE id_amigos = p_id_amigos;
+
+    ELSEIF p_opcion = 'RECHAZAR' THEN
+        -- Actualiza la solicitud pendiente a 'Rechazado'
+        UPDATE amigos
+        SET estado = 'Rechazado'
+        WHERE id_amigos = p_id_amigos;
+
+    ELSEIF p_opcion = 'BLOQUEAR' THEN
+        -- Actualiza la solicitud pendiente a 'Bloqueado'
+        UPDATE amigos
+        SET estado = 'Bloqueado'
+        WHERE id_amigos = p_id_amigos;
+
+        UPDATE amigos
+        SET estado = 'Eliminado'
+        WHERE usuario_id = p_amigo_id
+        AND amigo_id = p_usuarios_id;
+
+    ELSEIF p_opcion = 'ELIMINAR' THEN
+        -- Actualiza la solicitud pendiente a 'Eliminado'
+        UPDATE amigos
+        SET estado = 'Eliminado'
+        WHERE id_amigos = p_id_amigos;
+
+        -- Actualiza la amistad inversa a 'Eliminado'
+        UPDATE amigos
+        SET estado = 'Eliminado'
+        WHERE usuario_id = p_amigo_id
+          AND amigo_id = p_usuarios_id;
+
+    ELSE
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Opción inválida para la solicitud';
+    END IF;
             
 
 -- PENDIENTES: Obtener solicitudes de amistad pendientes para el usuario (donde p_usuarios_id coincide con amigo_id)
@@ -50,27 +113,49 @@ WHEN 'E' THEN
 
 -- AGREGAR: Enviar solicitud de amistad (Agregar amigo)
 WHEN 'N' THEN
+    -- Verifica si la relación ya existe
     IF NOT EXISTS (
         SELECT 1 
         FROM amigos 
         WHERE usuario_id = p_usuarios_id 
           AND amigo_id = p_amigo_id
     ) THEN
+        -- Inserta la relación si no existe
         INSERT INTO amigos (usuario_id, amigo_id)
         VALUES (p_usuarios_id, p_amigo_id);
-    END IF;
 
-        -- S: Buscar Usuarios
-        WHEN 'S' THEN
-            SELECT 
-                usuarios_id, 
-                username, 
-                imagen_perfil
-            FROM usuarios
-            WHERE (username LIKE CONCAT('%', p_busqueda, '%')
-               OR email LIKE CONCAT('%', p_busqueda, '%')
-               OR nombres LIKE CONCAT('%', p_busqueda, '%'))
-               AND p_usuarios_id <> usuarios_id;
+    -- Verifica si la relación existe pero está en estado "Rechazado"
+    ELSEIF EXISTS (
+        SELECT 1
+        FROM amigos
+        WHERE usuario_id = p_usuarios_id 
+          AND amigo_id = p_amigo_id
+          AND (estado = 'Rechazado' OR estado = 'Bloqueado')
+    ) THEN
+        -- Actualiza el estado a "Pendiente" si estaba en "Rechazado" o en bloqueado
+        UPDATE amigos
+        SET estado = 'Pendiente'
+        WHERE usuario_id = p_usuarios_id 
+          AND amigo_id = p_amigo_id;
+    END IF;
+-- S: Busqueda de personas que no sean el loggeado ni que hayan bloqueado al loggeado
+       WHEN 'S' THEN
+SELECT 
+    usuarios.usuarios_id, 
+    usuarios.username, 
+    usuarios.imagen_perfil
+FROM usuarios
+WHERE 
+    (username LIKE CONCAT('%', p_busqueda, '%')
+     OR email LIKE CONCAT('%', p_busqueda, '%')
+     OR nombres LIKE CONCAT('%', p_busqueda, '%'))
+     AND usuarios_id <> p_usuarios_id
+     AND usuarios.usuarios_id NOT IN (
+         SELECT usuario_id 
+         FROM amigos 
+         WHERE amigo_id = p_usuarios_id 
+           AND estado = 'Bloqueado'
+     );
 
 -- M: Inserción de imágenes en media_publicaciones
 WHEN 'M' THEN

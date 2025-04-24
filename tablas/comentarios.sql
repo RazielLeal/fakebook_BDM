@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 23-04-2025 a las 10:36:15
+-- Tiempo de generación: 24-04-2025 a las 08:07:27
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -36,6 +36,14 @@ CREATE TABLE `comentarios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Volcado de datos para la tabla `comentarios`
+--
+
+INSERT INTO `comentarios` (`comentario_id`, `usuarios_id`, `publicacion_id`, `contenido`, `fecha_comentario`) VALUES
+(2, 21, 58, 'Prueba', '2025-04-23 22:48:15'),
+(3, 21, 58, 'abr segundo com,entario', '2025-04-23 23:53:24');
+
+--
 -- Índices para tablas volcadas
 --
 
@@ -55,7 +63,7 @@ ALTER TABLE `comentarios`
 -- AUTO_INCREMENT de la tabla `comentarios`
 --
 ALTER TABLE `comentarios`
-  MODIFY `comentario_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'PRIMARY KEY, AUTO_INCREMENT\r\n', AUTO_INCREMENT=2;
+  MODIFY `comentario_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'PRIMARY KEY, AUTO_INCREMENT\r\n', AUTO_INCREMENT=4;
 
 --
 -- Restricciones para tablas volcadas

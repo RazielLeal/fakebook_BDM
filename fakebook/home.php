@@ -3,6 +3,11 @@
     require 'config.php';
     session_start(); 
 
+    if (!isset($_SESSION['usuarios_id'])) {
+        header("Location: index.php");
+        exit;
+    }
+    
     $usuarios_id = $_SESSION['usuarios_id']; 
 
     if ($conn->connect_error) {
@@ -145,40 +150,72 @@
                             
 
                         echo '</div>';
-
-                        //<!-- CONTAINER DEL NOMBRE DE USUARIO DE LA PUBLICACION -->
+                        
                         echo '<div class="PublicacionHeaderNombre" id="PublicacionHeaderNombre">';
 
                             echo '<img class="pppublis" src="' . $imagen_perfil . '" alt="">';
                             echo '<a class="nombresamigos" href="">' . htmlspecialchars($username) . '</a>';
 
                         echo '</div>';
+                        
+                        ?>
+
+
+                        <!-- FUNCION DE COMENTAR -->
+                        <form class="PublicacionInteracciones" method="POST" action="comentar.php">
+
+                            <input type="hidden" name="usuarios_id" value="<?php echo htmlspecialchars($usuarios_id, ENT_QUOTES, 'UTF-8');?>"> <!-- ID del usuario que comenta -->
+                            <input type="hidden" name="publicacion_id" value="<?php echo htmlspecialchars($publicacion_id, ENT_QUOTES, 'UTF-8');?>"> <!-- ID de la publicación -->
+                            <?php echo "Usuario ID: $usuarios_id, Publicación ID: $publicacion_id"; ?>
+
+                            <textarea name="contenido" placeholder="Escribe un comentario..." class="comentarioTextbox" rows="2" maxlength="100" required></textarea>
+                            <button type="submit" class="btnComentar">📝 Publicar comentario</button>
+
+                        </form>
+
+                        <!-- LIKES Y GUARDAR -->
+                        <div class="botonesInteraccion">
+
+                            <?php echo '<button class="btnLike" data-publicacion_id="'.$publicacion_id.'">👍 Me gusta</button>';?>
+                            <?php echo '<button class="btnGuardar">💾 Guardar</button>';?>
+
+                        </div>
+
+                        <!-- CONTAINER DE LOS COMENTARIOS DE LA PUBLICACION -->
+                        <div class="comentariosList">
+
+                            <?php
+                                // Llama a la rama G del SP_Master para obtener los comentarios de esta publicación
+                                $accion_obtener_comentarios = "G";
+                                $sql_select = "CALL SP_Master(?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
+                                $stmt = $conn->prepare($sql_select);
+                                $stmt->bind_param("si", $accion_obtener_comentarios, $publicacion_id);
+
+                                if ($stmt->execute()) {
+                                    $result_comentarios = $stmt->get_result();
+                                    $comentarios = $result_comentarios->fetch_all(MYSQLI_ASSOC);
+
+                                    // Mostrar los comentarios en el contenedor
+                                    foreach ($comentarios as $comentario) {
+                                        echo '<div class="comentarioTextbox">';
+                                        echo '<p class="comentario"><strong>' . htmlspecialchars($comentario['username'], ENT_QUOTES, 'UTF-8') . ':</strong> ' . htmlspecialchars($comentario['contenido'], ENT_QUOTES, 'UTF-8') . '</p>';
+                                        echo '</div>';
+                                    }
+                                } else {
+                                    echo '<p>No se pudieron cargar los comentarios.</p>';
+                                }
+                                $stmt->close();
+                            ?>
+
+                        </div>
 
                         
+                        
+                        
+                        
+                    <?php } ?>
 
-                        //<!-- CONTAINER DE LA INTERACCION DE LA PUBLICACION -->
-                        echo '<div class="PublicacionInteracciones">'; 
 
-                            echo '<textarea placeholder="Escribe un comentario..." class="comentarioTextbox" rows="2" maxlength="100"></textarea>'; 
-                            echo '<button class="btnComentar">📝 Publicar comentario</button>'; 
-
-                        echo '</div>'; 
-
-                        echo '<div class="botonesInteraccion">';
-
-                            echo '<button class="btnLike" data-publicacion_id="'.$publicacion_id.'">👍 Me gusta</button>';
-                            echo '<button class="btnGuardar">💾 Guardar</button>';
-
-                        echo '</div>';
-
-                        //<!-- CONTAINER DE LOS COMENTARIOS DE LA PUBLICACION -->
-                        echo '<div class="comentariosList"></div>';
-
-                        echo '</div>';
-
-                    }
-                
-                ?>
             </section>
 
         </section>
@@ -188,65 +225,8 @@
 
 
     <script src="previewIMG.js"></script>
-    <script>
-    // Esperamos a que todo el DOM esté cargado
-    document.addEventListener('DOMContentLoaded', () => {
 
-
-        const publicaciones = document.querySelectorAll('.Publicacion');
-
-        publicaciones.forEach(publi => {
-            const btnComentar = publi.querySelector('.btnComentar');
-            const textarea = publi.querySelector('.comentarioTextbox');
-            const comentariosList = publi.querySelector('.comentariosList');
-
-            btnComentar.addEventListener('click', () => {
-                const texto = textarea.value.trim();
-                if (texto !== '') {
-                    const nuevoComentario = document.createElement('p');
-                    nuevoComentario.textContent = texto;
-                    nuevoComentario.classList.add('comentario');
-                    comentariosList.appendChild(nuevoComentario);
-                    textarea.value = '';
-                }
-            });
-        });
-
-        const btnLikes = document.querySelectorAll('.btnLike');
-
-        btnLikes.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const publicacion_id = this.closest('.Publicacion').querySelector('.btnLike').dataset.publicacion_id;
-                const usuarios_id = <?php echo $usuarios_id; ?>;  // Obtener el ID del usuario desde PHP
-
-                // Realizamos la llamada AJAX
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', 'dar_like.php', true);
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.onload = function() {
-                    console.log(xhr.responseText);  // Verifica lo que estás recibiendo del servidor
-                    if (xhr.status === 200) {
-                        try {
-                            const response = JSON.parse(xhr.responseText);
-                            if (response.success) {
-                                // alert('¡Me gusta agregado!');
-                            } else {
-                                // alert('¡Ya le diste like a esta publicación!');
-                                console.log("ID de publicación:" + publicacion_id);
-                            }
-                        } catch (e) {
-                            console.error("Error al parsear JSON", e);
-                            //alert('Respuesta no es un JSON válido');
-                        }
-                    } else {
-                        //alert('Error al procesar la solicitud.');
-                    }
-                };
-                xhr.send('usuarios_id=' + usuarios_id + '&publicacion_id=' + publicacion_id);
-            });
-        });        
-
-    });
-</script>
+   
+    
 </body>
 </html>

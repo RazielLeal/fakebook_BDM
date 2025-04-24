@@ -11,7 +11,7 @@ if (isset($_POST['usuarios_id']) && isset($_POST['publicacion_id'])) {
 
     // Llamamos al stored procedure para dar el like
     //$sql = "CALL SP_DarLike(?, ?)";
-    $sql = "CALL SP_Master(?, ?, NULL, NULL, NULL, NULL, NULL, NULL, ?, NULL, NULL, NULL)";
+    $sql = "CALL SP_Master(?, ?, NULL, NULL, NULL, NULL, NULL, NULL, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
     $stmt = $conn->prepare($sql);
     $accion = 'L';  
     $stmt->bind_param("sii", $accion, $usuarios_id, $publicacion_id);

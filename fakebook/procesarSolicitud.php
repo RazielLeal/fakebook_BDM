@@ -9,10 +9,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
     $accion = "J";
     $p_id_amigos   = $_POST['id_amigos'];
     $p_solicitante = $_POST['solicitante'];
-    $p_opcion      = $_POST['opcion']; // 'ACEPTAR' o 'RECHAZAR'
+    $p_opcion      = $_POST['opcion']; // 'ACEPTAR', 'RECHAZAR', 'BLOQUEAR', 'ELIMINAR'
     $p_usuarios_id = $_SESSION['usuarios_id']; // El receptor
     
-   
+    //var_dump($_POST);
     // Llama a SP_Master pasando todos los parámetros necesarios.
     // Ajusta el número y orden de parámetros según la definición de tu SP_Master.
     $sql = "CALL SP_Master(?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?, ?, ?)";

@@ -3,7 +3,7 @@
     require 'config.php'; 
 
     if (!isset($_SESSION['usuarios_id'])) {
-        header("Location: login.php");
+        header("Location: index.php");
         exit;
     }
     
@@ -16,8 +16,10 @@
         $resultados = array(); // o puedes mostrar contenido por defecto
     }
     
+    
+    $p_usuarios_id = $_SESSION['usuarios_id']; // ID del usuario logueado
 
-    $p_usuarios_id = $_SESSION['usuarios_id'];
+
     $accion = "E";
     $sql = "CALL SP_Master(?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
     $stmt = $conn->prepare($sql);
@@ -35,6 +37,22 @@
     }
     $stmt->close();
     
+    $sql="CALL SP_Master(?,?,NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
+    $stmt = $conn->prepare($sql);
+    $accion = "Q";// Acción para obtener amigos ACEPTADOS
+    $stmt->bind_param("si", $accion, $p_usuarios_id);
+
+    if ($stmt->execute()) {
+        $resultAmigos = $stmt->get_result();
+        
+        $amigos = array();
+        while ($row = $resultAmigos->fetch_assoc()) {
+            $amigos[] = $row;
+        }
+    } else {
+        echo "Error en la consulta: " . $stmt->error;
+    }
+    $stmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -119,17 +137,6 @@
                 </form>                
 
                 <div class="conatinerSearchResult" id="conatinerSearchResult">
-                    <!-- <div class="searchResult">                
-                        <div class="ppsearch">
-                            <img src="IMG/pp.png" alt="">
-                        </div>
-                        <div class="nombresamigos">
-                            <div>Juanito Pérez Monterreal</div>
-                        </div>
-                        <div class="botones">
-                            <img src="IMG/addfriend.png" alt="">
-                        </div>
-                    </div>                    -->
 
                     <?php
                     // Recorremos los resultados y mostramos cada uno
@@ -186,46 +193,52 @@
                 </div>
 
                 <div class="selectAmigosContainer">
-                    <div class="selectAmigo" href="">
-                        <div class="selectAmigoPP">
-                            <img src="IMG/pp.png" alt="foto de perfil de amigo">
-                        </div>
-                        <div class="selectAmigoNombre">
-                            Juanito Pérez Monterreal
-                        </div>
-                        <div class="selectAmigoBotones">
-                            <img src="IMG/deluser.png" alt="eliminar">
-                            <img src="IMG/blockuser.png" alt="bloquear">
-                        </div>
-                    </div>
+                    <?php
+                        // Recorremos los amigos y mostramos cada uno
+                        if (!empty($resultAmigos)) {
+                            foreach ($resultAmigos as $amigo) {
+                                $id_amigos = $amigo['id_amigos']; // ID de la relación
+                                $amigo_id = $amigo['amigo_id']; // ID del amigo en la relación
+                                $username_amigo = $amigo['username']; // Nombre del amigo
+                                $imagen_amigo   = $amigo['imagen_perfil']; // Imagen del amigo
+                                
+                                ?>
+                                <div class="selectAmigo">
+                                    <div class="selectAmigoPP">
+                                        <?php
+                                        if (!empty($imagen_amigo)) {
+                                            echo '<img src="data:image/png;base64,' . base64_encode($imagen_amigo) . '">';
+                                        } else {
+                                            echo '<img src="IMG/pp.png" alt="Imagen de perfil por defecto">';
+                                        }
+                                        ?>
+                                    </div>
 
-                    <div class="selectAmigo" href="">
-                        <div class="selectAmigoPP">
-                            <img src="IMG/pp.png" alt="foto de perfil de amigo">
-                        </div>
-                        <div class="selectAmigoNombre">
-                            Juanito Pérez Monterreal
-                        </div>
-                        <div class="selectAmigoBotones">
-                            <img src="IMG/deluser.png" alt="eliminar">
-                            <img src="IMG/blockuser.png" alt="bloquear">
-                        </div>
-                    </div>
+                                    <div class="selectAmigoNombre">
+                                        <?php echo htmlspecialchars($username_amigo); ?>
+                                    </div>
 
-                    <div class="selectAmigo" href="">
-                        <div class="selectAmigoPP">
-                            <img src="IMG/pp.png" alt="foto de perfil de amigo">
-                        </div>
-                        <div class="selectAmigoNombre">
-                            Juanito Pérez Monterreal
-                        </div>
-                        <div class="selectAmigoBotones">
-                            <img src="IMG/deluser.png" alt="eliminar">
-                            <img src="IMG/blockuser.png" alt="bloquear">
-                        </div>
-                    </div>
-                    
-                  
+                                    <form method="POST" action="procesarSolicitud.php" class="selectAmigoBotones">
+                                        <!-- ID de la relación -->
+                                        <input type="hidden" name="id_amigos" value="<?php echo $id_amigos; ?>">
+                                        <!-- ID del amigo (solicitante) -->
+                                        <input type="hidden" name="solicitante" value="<?php echo $amigo_id; ?>">
+                                        <!-- Botón para eliminar -->
+                                        <button type="submit" name="opcion" value="ELIMINAR" style="border: none; background:none;">
+                                            <img src="IMG/deluser.png" alt="Eliminar">
+                                        </button>
+                                        <!-- Botón para bloquear -->
+                                        <button type="submit" name="opcion" value="BLOQUEAR" style="border: none; background:none;">
+                                            <img src="IMG/blockuser.png" alt="Bloquear">
+                                        </button>
+                                    </form>
+                                </div>
+                                <?php
+                            }
+                        } else {
+                            echo '<div>No tienes amigos registrados.</div>';
+                        }
+                    ?>
                 </div>
 
             </section>
@@ -246,7 +259,6 @@
                                 $imagenSolicitante   = $solicitud['imagen_perfil'];
 
                                 // Imprimir en la consola los datos de id_amigos, usuario_id y usernameSolicitante
-                                echo '<script>console.log("id_amigos: ' . $id_amigos . ', usuario_id: ' . $usuarioSolicitante . ', usernameSolicitante: ' . htmlspecialchars($usernameSolicitante) . '");</script>';
                                 ?>
                                 <div class="solicitud">
                                     <div class="selectAmigoPP">
