@@ -125,28 +125,27 @@
                 
                         echo '<div class="Publicacion" id="Publicacion_'. $publicacion_id . '">';
 
-                        //<!-- CONTAINER DEL TEXTO DE LA PUBLICACION -->
-                        echo '<div class="PublicacionBody" id="PublicacionBody">';
+                                //<!-- CONTAINER DEL TEXTO DE LA PUBLICACION -->
+                                echo '<div class="PublicacionBody" id="PublicacionBody">';
 
-                            echo '<p>' . htmlspecialchars($contenido) . '</p>';
+                                    echo '<p>' . htmlspecialchars($contenido) . '</p>';
 
-                        echo '</div>';
+                                echo '</div>';
 
-                        // <!-- CONTAINER DE LA IMAGEN DE LA PUBLICACION -->
-                        echo '<div class="PublicacionHeaderImg" id="PublicacionHeaderImg">';
 
-                            //echo '<img src="IMG/meme.jpg" alt="">';
-                            //echo '<img src="data:image/png;base64,' . base64_encode($row["url_media"]) . '" alt="">';
-                            if ($row["tipo"] === "imagen") {
-                                // Muestra la imagen; si conoces el formato, ajusta "image/png"
-                                echo '<img src="data:image/png;base64,' . base64_encode($row["url_media"]) . '" alt="">';
-                            } elseif ($row["tipo"] === "video") {
-                                // Muestra el video; ajusta el tipo MIME ("video/mp4") según corresponda
-                                echo '<video controls>';
-                                echo '<source src="data:video/mp4;base64,' . base64_encode($row["url_media"]) . '" type="video/mp4">';
-                                echo 'Tu navegador no soporta la etiqueta de video.';
-                                echo '</video>';
-                            }
+                                // <!-- CONTAINER DE LA IMAGEN DE LA PUBLICACION -->
+                                echo '<div class="PublicacionHeaderImg" id="PublicacionHeaderImg">';
+
+                                if ($row["tipo"] === "imagen") {
+                                    // Muestra la imagen; si conoces el formato, ajusta "image/png"
+                                    echo '<img src="data:image/png;base64,' . base64_encode($row["url_media"]) . '" alt="">';
+                                } elseif ($row["tipo"] === "video") {
+                                    // Muestra el video; ajusta el tipo MIME ("video/mp4") según corresponda
+                                    echo '<video controls>';
+                                    echo '<source src="data:video/mp4;base64,' . base64_encode($row["url_media"]) . '" type="video/mp4">';
+                                    echo 'Tu navegador no soporta la etiqueta de video.';
+                                    echo '</video>';
+                                }
                             
 
                         echo '</div>';
@@ -164,9 +163,9 @@
                         <!-- FUNCION DE COMENTAR -->
                         <form class="PublicacionInteracciones" method="POST" action="comentar.php">
 
-                            <input type="hidden" name="usuarios_id" value="<?php echo htmlspecialchars($usuarios_id, ENT_QUOTES, 'UTF-8');?>"> <!-- ID del usuario que comenta -->
-                            <input type="hidden" name="publicacion_id" value="<?php echo htmlspecialchars($publicacion_id, ENT_QUOTES, 'UTF-8');?>"> <!-- ID de la publicación -->
-                            <?php echo "Usuario ID: $usuarios_id, Publicación ID: $publicacion_id"; ?>
+                            <input type="hidden" name="usuarios_id" value="<?php echo htmlspecialchars($usuarios_id);?>"> <!-- ID del usuario que comenta -->
+                            <input type="hidden" name="publicacion_id" value="<?php echo htmlspecialchars($publicacion_id);?>"> <!-- ID de la publicación -->
+                            
 
                             <textarea name="contenido" placeholder="Escribe un comentario..." class="comentarioTextbox" rows="2" maxlength="100" required></textarea>
                             <button type="submit" class="btnComentar">📝 Publicar comentario</button>
@@ -185,7 +184,7 @@
                         <div class="comentariosList">
 
                             <?php
-                                // Llama a la rama G del SP_Master para obtener los comentarios de esta publicación
+                                Llama a la rama G del SP_Master para obtener los comentarios de esta publicación
                                 $accion_obtener_comentarios = "G";
                                 $sql_select = "CALL SP_Master(?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
                                 $stmt = $conn->prepare($sql_select);
@@ -198,7 +197,7 @@
                                     // Mostrar los comentarios en el contenedor
                                     foreach ($comentarios as $comentario) {
                                         echo '<div class="comentarioTextbox">';
-                                        echo '<p class="comentario"><strong>' . htmlspecialchars($comentario['username'], ENT_QUOTES, 'UTF-8') . ':</strong> ' . htmlspecialchars($comentario['contenido'], ENT_QUOTES, 'UTF-8') . '</p>';
+                                        echo '<div class="comentario"><strong>' . htmlspecialchars($comentario['username']) . ':</strong> ' . htmlspecialchars($comentario['contenido']) . '</div>';
                                         echo '</div>';
                                     }
                                 } else {
@@ -210,7 +209,8 @@
                         </div>
 
                         
-                        
+                        </div>
+
                         
                         
                     <?php } ?>
