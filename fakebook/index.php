@@ -79,8 +79,28 @@ if (isset($_POST['btnformis'])) {
         </section>
     
         <section class="contimglp" id="contimglp">
-                <img src="IMG/people.jpg" alt="Descripción de la imagen" width="400" height="400">
-                <img src="IMG/peolpe_2.png" alt="Descripción de la imagen" width="900px" height="380">      
+        <img src="IMG/peolpe_2.png" alt="Descripción de la imagen" width="40px" height="100px">
+        <div class="container">
+          <div class="world"></div>
+          <div class="user">
+            <img src="IMG/pp.png" alt="User 1"> <!-- Imagen de perfil -->
+          </div>
+          <div class="user">
+            <img src="IMG/pp.png" alt="User 2"> <!-- Imagen de perfil -->
+          </div>
+          <div class="user">
+            <img src="IMG/pp.png" alt="User 3"> <!-- Imagen de perfil -->
+          </div>
+          <div class="user">
+            <img src="IMG/pp.png" alt="User 4"> <!-- Imagen de perfil -->
+          </div>
+          <div class="user">
+            <img src="IMG/pp.png" alt="User 5"> <!-- Imagen de perfil -->
+          </div>
+          <div class="user">
+            <img src="IMG/pp.png" alt="User 6"> <!-- Imagen de perfil -->
+          </div>
+        </div>
         </section>
         
     
