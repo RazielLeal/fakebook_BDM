@@ -120,7 +120,7 @@
     flex-direction: column;
     gap: 15px;
     margin-top: 20px;
-}
+    }
 
 .misPublicacionesContainer h2 {
     margin: 0 0 15px 0;
@@ -440,6 +440,20 @@
     font-style: italic;
 }
 
+.textoModal {
+    background-color: var(--terciario); /* Fondo en color terciario */
+    color: var(--letranegra); /* Texto en color negro */
+    padding: 15px; /* Espaciado interno */
+    border-radius: 8px; /* Bordes redondeados */
+    font-size: 16px; /* Tamaño de letra */
+    font-weight: 500; /* Grosor de la letra */
+    text-align: center; /* Alinear texto al centro */
+    width: fit-content; /* Ajustar al contenido */
+    max-width: 80%; /* Evitar que sea demasiado ancho */
+    margin: 20px auto; /* Centrar dentro del modal */
+    box-shadow: 2px 2px 10px var(--sombra2); /* Efecto de sombra */
+}
+
 /* Responsividad */
 @media (max-width: 1200px) {
     .guardadosContainer {
@@ -547,8 +561,23 @@
                         
                         <div>Correo:</div>
                         <input type="text" name="cambiarcorreo" id="cambiarcorreo" value="<?php echo $email; ?>" placeholder="Ingrese su nuevo correo:" class="inputgen">
-                    
+                        <br>
+                        <?php
 
+                        $sql_edad = "CALL SP_Galeria('E',?)";
+                        $stmt_edad = $conn->prepare($sql_edad);
+                        $stmt_edad->bind_param("i", $usuarios_id);
+                        $stmt_edad->execute();
+                        $result_edad = $stmt_edad->get_result();
+                        $row = $result_edad->fetch_assoc();
+                        $stmt_edad->close();
+
+                        // Decodificar el JSON recibido de la función
+                        $datos_usuario = json_decode($row['datos'], true);
+
+                        // Mostrar la información correctamente
+                        echo '<div>Edad: ' . htmlspecialchars($datos_usuario['edad']) . ' años </div>';
+                        echo '<div>Tiempo registrado: ' . htmlspecialchars($datos_usuario['tiempo_registro']) . '</div>';                        ?>
                     </div>
 
                     <div id="acomodarbotones">
@@ -873,41 +902,47 @@ try {
 
     <script src="perfil.js"></script>
     <script>
-        function abrirModal(elemento) {
-            const modal = document.getElementById("modalFoto");
-            modal.innerHTML = '<span class="cerrarModal" onclick="cerrarModal()">&times;</span>'; // Limpiar contenido
+function abrirModal(elemento) {
+    const modal = document.getElementById("modalFoto");
+    modal.innerHTML = '<span class="cerrarModal" onclick="cerrarModal()">&times;</span>'; // Limpiar contenido
 
-            const contenidoTexto = elemento.getAttribute("data-contenido"); // Obtener contenido
+    const contenidoTexto = elemento.getAttribute("data-contenido"); // Obtener contenido
 
-            const imagen = elemento.querySelector("img");
-            const video = elemento.querySelector("video");
+    // Crear el contenedor de texto y agregar el contenido
+    const textoContainer = document.createElement("div");
+    textoContainer.classList.add("textoModal"); // Asegúrate de que tiene estilo
+    textoContainer.innerText = contenidoTexto;
 
-            if (imagen) {
-                const nuevaImagen = document.createElement("img");
-                nuevaImagen.classList.add("contenidoModal");
-                nuevaImagen.src = imagen.src;
-                modal.appendChild(nuevaImagen);
-            } else if (video) {
-                const nuevoVideo = document.createElement("video");
-                nuevoVideo.classList.add("contenidoModal");
-                nuevoVideo.controls = true;
-                nuevoVideo.autoplay = true;
-                const fuenteVideo = document.createElement("source");
-                fuenteVideo.src = video.querySelector("source").src;
-                fuenteVideo.type = video.querySelector("source").type;
-                nuevoVideo.appendChild(fuenteVideo);
-                modal.appendChild(nuevoVideo);
-            } else {
-                // Si es solo texto, mostrarlo en un cuadro en el modal
-                const textoContainer = document.createElement("div");
-                textoContainer.classList.add("textoModal");
-                textoContainer.innerText = contenidoTexto;
-                modal.appendChild(textoContainer);
-            }
+    const imagen = elemento.querySelector("img");
+    const video = elemento.querySelector("video");
 
-            modal.style.display = "block";
-        }
+    if (imagen) {
+        // ✅ Si es una imagen, mostrarla en el modal
+        const nuevaImagen = document.createElement("img");
+        nuevaImagen.classList.add("contenidoModal");
+        nuevaImagen.src = imagen.src;
 
+        modal.appendChild(nuevaImagen);
+    } else if (video) {
+        // ✅ Si es un video, mostrarlo en el modal
+        const nuevoVideo = document.createElement("video");
+        nuevoVideo.classList.add("contenidoModal");
+        nuevoVideo.controls = true;
+        nuevoVideo.autoplay = true;
+
+        const fuenteVideo = document.createElement("source");
+        fuenteVideo.src = video.querySelector("source").src;
+        fuenteVideo.type = video.querySelector("source").type;
+
+        nuevoVideo.appendChild(fuenteVideo);
+        modal.appendChild(nuevoVideo);
+    }
+
+    // ✅ Siempre agregar el texto debajo del contenido multimedia o solo si no hay imagen/video
+    modal.appendChild(textoContainer);
+
+    modal.style.display = "block";
+}
         function cerrarModal() {
             const modal = document.getElementById("modalFoto");
             modal.style.display = "none";
