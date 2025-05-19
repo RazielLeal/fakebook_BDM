@@ -349,6 +349,116 @@
         width: 95%;
     }
 }
+
+/* Añade este CSS al bloque de estilo existente */
+
+/* Contenedor de publicaciones guardadas */
+.guardadosContainer {
+    min-width: 300px;
+    width: 350px;
+    flex: 0 0 auto; /* No permite que se estire */
+    background-color: var(--secundario);
+    border-radius: 15px;
+    padding: 20px;
+    height: 650px;
+    overflow-y: auto; /* Permite desplazamiento vertical */
+}
+
+.guardadosContainer h2 {
+    margin: 0 0 15px 0;
+    font-size: 1.4em;
+    color: var(--texto);
+    position: sticky;
+    top: 0;
+    background-color: var(--secundario);
+    padding: 10px 0;
+    z-index: 2;
+}
+
+/* Cuadrícula de guardados */
+.guardadosGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas */
+    gap: 10px;
+    width: 100%;
+}
+
+/* Cada item guardado */
+.itemGuardado {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* Relación de aspecto cuadrada */
+    overflow: hidden;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.itemGuardado:hover {
+    transform: scale(1.03);
+}
+
+.itemGuardado img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Mantiene la proporción y cubre el contenedor */
+}
+.itemGuardado video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Mantiene la proporción y cubre el contenedor */
+}
+
+.textoGuardado {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--terciario);
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.9em;
+}
+
+.mensajeNoGuardados {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 20px;
+    color: var(--texto);
+    font-style: italic;
+}
+
+/* Responsividad */
+@media (max-width: 1200px) {
+    .guardadosContainer {
+        width: 100%;
+        height: auto;
+        max-height: 500px;
+    }
+    
+    .guardadosGrid {
+        grid-template-columns: repeat(3, 1fr); /* 3 columnas en pantallas más pequeñas */
+    }
+}
+
+@media (max-width: 600px) {
+    .guardadosGrid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas en pantallas muy pequeñas */
+    }
+}
+
     </style>
 </head>
 <body>
@@ -681,68 +791,70 @@ try {
     <!-- Las otras secciones (perfil, likes, publicaciones) que ya tenías -->
     <!-- ... -->
     
-            <div class="guardadosContainer" id="guardadosContainer">
-            <h2>Publicaciones Guardadas</h2>
-            <div class="guardadosGrid" id="guardadosGrid">
-            <?php
-                // Verificar conexión
-                if (!isset($conn) || $conn->connect_error) {
-                    $conn = new mysqli($servername, $username, $password, $dbname);
-                    if ($conn->connect_error) {
-                        die("Conexión fallida: " . $conn->connect_error);
-                    }
-                }
+            <!-- Sección de publicaciones guardadas (MODIFICADA para que sea igual a la galería) -->
+<section class="guardadosContainer" id="guardadosContainer">
+    <h2>Publicaciones Guardadas</h2>
+    <div class="guardadosGrid" id="guardadosGrid">
+        <?php
+        // Verificar conexión
+        if (!isset($conn) || $conn->connect_error) {
+            $conn = new mysqli($servername, $username, $password, $dbname);
+            if ($conn->connect_error) {
+                die("Conexión fallida: " . $conn->connect_error);
+            }
+        }
 
-                try {
-                    // Llamar al SP_Galeria con la acción 'S' para publicaciones guardadas
-                    $query = "CALL SP_Galeria('S', ?)";
-                    $stmt = $conn->prepare($query);
+        try {
+            // Llamar al SP_Galeria con la acción 'S' para publicaciones guardadas
+            $query = "CALL SP_Galeria('S', ?)";
+            $stmt = $conn->prepare($query);
 
-                    if (!$stmt) {
-                        echo "Error en la preparación de la consulta: " . $conn->error;
-                    } else {
-                        $stmt->bind_param("i", $usuarios_id);
+            if (!$stmt) {
+                echo "Error en la preparación de la consulta: " . $conn->error;
+            } else {
+                $stmt->bind_param("i", $usuarios_id);
 
-                        if (!$stmt->execute()) {
-                            echo "Error al ejecutar la consulta: " . $stmt->error;
-                        } else {
-                            $result_guardados = $stmt->get_result();
+                if (!$stmt->execute()) {
+                    echo "Error al ejecutar la consulta: " . $stmt->error;
+                } else {
+                    $result_guardados = $stmt->get_result();
 
-                            if ($result_guardados->num_rows > 0) {
-                                while ($row = $result_guardados->fetch_assoc()) {
-                                    $publicacion_id = $row['publicacion_id'];
-                                    $contenido = htmlspecialchars($row['contenido']); // Sanitización
-                                    $url_media = $row['url_media'];
-                                    $tipo = $row['tipo'];
+                    if ($result_guardados->num_rows > 0) {
+                        while ($row = $result_guardados->fetch_assoc()) {
+                            $publicacion_id = $row['publicacion_id'];
+                            $contenido = htmlspecialchars($row['contenido']); // Sanitización
+                            $url_media = $row['url_media'];
+                            $tipo = $row['tipo'];
 
-                                    echo '<div class="itemGuardado" data-id="'.$publicacion_id.'" data-contenido="'.$contenido.'" onclick="abrirModal(this)">';
+                            echo '<div class="itemGuardado" data-id="'.$publicacion_id.'" data-contenido="'.$contenido.'" onclick="abrirModal(this)">';
 
-                                    if (!empty($url_media)) {
-                                        if ($tipo === "video") {
-                                            echo '<video>';
-                                            echo '<source src="data:video/mp4;base64,'.base64_encode($url_media).'" type="video/mp4">';
-                                            echo '</video>';
-                                        } else {
-                                            echo '<img src="data:image/png;base64,'.base64_encode($url_media).'" alt="Foto de publicación">';
-                                        }
-                                    } else {
-                                        echo '<p class="textoGuardado">'.$contenido.'</p>';
-                                    }
-
-                                    echo '</div>';
+                            if (!empty($url_media)) {
+                                if ($tipo === "video") {
+                                    echo '<video>';
+                                    echo '<source src="data:video/mp4;base64,'.base64_encode($url_media).'" type="video/mp4">';
+                                    echo '</video>';
+                                } else {
+                                    echo '<img src="data:image/png;base64,'.base64_encode($url_media).'" alt="Foto de publicación">';
                                 }
                             } else {
-                                echo '<p class="mensajeNoGuardados">Aún no has guardado publicaciones</p>';
+                                echo '<div class="textoGuardado">'.$contenido.'</div>';
                             }
 
-                            $stmt->close();
+                            echo '</div>';
                         }
+                    } else {
+                        echo '<p class="mensajeNoGuardados">Aún no has guardado publicaciones</p>';
                     }
-                } catch (Exception $e) {
-                    echo "Error: " . $e->getMessage();
+
+                    $stmt->close();
                 }
-            ?>
-        </div>
+            }
+        } catch (Exception $e) {
+            echo "Error: " . $e->getMessage();
+        }
+        ?>
+    </div>
+</section>
 
     </div>
 
